@@ -1,0 +1,57 @@
+/* Remove white border*/
+* {
+    margin: 0;
+    padding: 0;
+}
+
+.top-nav {
+    overflow: hidden;
+    background-color: #b38f419d;
+}
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #f1eaea52;
+  }
+.top-nav a{
+    float: right;
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 20px;
+    text-decoration: none;
+}
+
+/*Changes colour when hover on link*/
+.top-nav a:hover{
+    background-color: #a5894c9d;
+}
+
+.title {
+    text-align: center;
+    padding: 50px;
+}
+
+.footer-page {
+    display: block;
+    background-color: #b38f419d;
+}
+
+/*Tank video on home page*/
+#myVideo {
+    position: sticky;
+    right: 0;
+    bottom: 0;
+    width: 100%; 
+    height: 100%;
+  }
+
+.home-page {
+    
+}
+
+.contact-page {
+    padding: 15em;
+}
