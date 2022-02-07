@@ -8,35 +8,49 @@
     overflow: hidden;
     background-color: #b38f419d;
 }
-ul {
-    list-style-type: none;
+.nav-links {
     margin: 0;
     padding: 0;
     overflow: hidden;
     background-color: #f1eaea52;
   }
-.top-nav a{
+
+.nav-links li{
     float: right;
+    display: block;
+    position: relative;
+  }
+
+.nav-links a{
     display: block;
     color: white;
     text-align: center;
     padding: 14px 20px;
     text-decoration: none;
 }
-
 /*Changes colour when hover on link*/
 .top-nav a:hover{
     background-color: #a5894c9d;
+    cursor: pointer;
+}
+/* Drop Down Menu */
+.dropdown-content li{
+    float: none;
+}
+.dropdown-content {
+    display: none;
+    position: relative; 
+}
+.gallery-conent:hover>ul{
+    display:block;
+}
+.nav-links li a{
+    display: block;
 }
 
 .title {
     text-align: center;
     padding: 50px;
-}
-
-.footer-page {
-    display: block;
-    background-color: #b38f419d;
 }
 
 /*Tank video on home page*/
@@ -55,3 +69,98 @@ ul {
 .contact-page {
     padding: 15em;
 }
+
+
+.footer-page {
+    display: grid;
+    background-color: #b38f419d;
+    padding: 50px 0px;
+    grid-template-columns: 50% auto;
+}
+/* Styles for icons in footer*/
+.fa {
+    float:right;
+    font-size: 60px;
+    text-decoration: none;
+  }
+.fa:hover {
+    opacity: 0.7;
+  }
+.fa-instagram {
+    grid-column: 3;
+    grid-row: 1;
+    color: black;
+  }
+.fa-github {
+    grid-column: 3;
+    grid-row: 1;
+    color: rgb(0, 0, 0);
+  }
+.fa-linkedin {
+    grid-column: 3;
+    grid-row: 1;
+    color: black;
+  }
+.fa-twitter {
+    grid-column: 3;
+    grid-row: 1;
+    color: black;
+  }
+
+/* Gallery Page */
+.container img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width:  300px;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+/*Wallpaper for Gallery*/
+.main-container{
+  background-image: url("Tanks/bg.jpg");
+  background-size: cover;         
+  background-position: center;            
+}
+.main-container h1{
+  color: white;
+  border-radius: 20px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.829);
+  width: 150px;
+}
+.container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 50px;
+  padding:20px 20px 50px;
+}
+#ww1{
+  justify-content: center;
+  align-content: center;
+}
+.card{
+  background-color: rgba(65, 30, 1, 0.651);
+  border-radius: 20px;
+  max-width: 350px;
+  height: 100%;
+  padding-top: 20px;
+  margin-right: 0px;
+}
+.card .info {
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.459);
+  width: 300px;
+  padding: 0;
+}
+.card h2{
+  color: black;
+  margin-top:5px;
+  text-align: center;
+}
+

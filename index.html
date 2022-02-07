@@ -10,24 +10,30 @@
         <!-- Header -->
         <header>
             <!-- Navigation Bar -->
-            <div class="top-nav">
-                <ul>
+            <nav class="top-nav">
+                <ul class="nav-links">
                     <li><a href="#home">HOME</a></li>
                     <li><a href="about.html">ABOUT</a></li>
-                    <li><a href="gallery.html">GALLERY</a></li>
+                    <li class="gallery-conent"><a href="gallery.html">GALLERY</a>
+                        <ul class="dropdown-content">
+                            <li><a href="gallery.html#Aircraft">Aircraft</a></li>
+                            <li><a href="gallery.html#cold-war">Cold War</a></li>
+                            <li><a href="gallery.html#ww2">WW2</a></li>
+                            <li><a href="gallery.html#ww1">WW1</a></li>
+                        </ul>
+                    </li>
                     <li><a href="#contact">CONTACT</a></li>
                 </ul>
-                <h1 class="title">My Heading</h1>
-                
-            </div>
+            </nav>
         </header>
         <!-- Body -->
         <div class="home-page" id="home"> 
-            <video autoplay muted loop id="myVideo">
-                <source src="T-72.mp4" type="video/mp4">
-                Your browser does not support HTML5 video.
-            </video>
+            <h1 class="title">My Heading</h1>
             <!-- Tank -->
+            <video autoplay muted loop id="myVideo">
+                <source src="Tanks/T-72.mp4" type="video/mp4">
+            </video>
+            
 
             <!-- Contact Page -->
             <div class="contact-page" id="contact">
@@ -38,14 +44,30 @@
         <footer class="footer-page">
             <div>
                 <p>Footer</p>
-                <!-- Instagram -->
-
-                <!-- LinkedIn -->
-
-                <!-- GitHub -->
 
 
             </div>
+            <div class="socials"> 
+                <!-- Instagram -->
+                <a href="https://www.instagram.com/nikita.berezyuk/" target="_blank" class="fa fa-instagram">
+                    <ion-icon name="logo-instagram"></ion-icon>
+                </a>
+                <!-- LinkedIn -->
+                <a href="https://www.linkedin.com/in/nikita-berezyuk-21a87118b" target="_blank" class="fa fa-linkedin">
+                    <ion-icon name="logo-linkedin"></ion-icon>
+                </a>
+                <!-- GitHub -->
+                <a href="https://github.com/berezucc" target="_blank" class="fa fa-github">
+                    <ion-icon name="logo-github"></ion-icon>
+                </a>
+                <!-- Twitter -->
+                <a href="https://twitter.com/berezucc" target="_blank" class="fa fa-twitter">
+                    <ion-icon name="logo-twitter"></ion-icon>
+                </a>
+            </div>
         </footer>
+
+        <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+        <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     </body>
 </html>
