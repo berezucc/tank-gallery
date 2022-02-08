@@ -6,7 +6,7 @@
 
 .top-nav {
     overflow: hidden;
-    background-color: #b38f419d;
+    background-color: rgba(180, 143, 65, 0.616);
 }
 .nav-links {
     margin: 0;
@@ -82,9 +82,12 @@
     float:right;
     font-size: 60px;
     text-decoration: none;
+    margin-right: 10px;
+    vertical-align: middle;
   }
 .fa:hover {
     opacity: 0.7;
+    transform: scale(1.1);
   }
 .fa-instagram {
     grid-column: 3;
@@ -108,6 +111,38 @@
   }
 
 /* Gallery Page */
+.gallery-parallax{
+  background-image: url("Images/lt2.jpg");
+  filter: blur(1px);
+  -webkit-filter: blur(4px);
+  height: 1000px;
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.gallery-text{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 50%;
+  transform: translate(-50%, -50%);
+  padding: 20px;
+  color: #0e0e0efb;
+  font-weight: bold;
+  font-size: 150%;
+  background-color: rgba(248, 248, 248, 0.329); 
+  border: 5px solid #000000;
+  border-radius: 10px;
+  text-align: center;
+  font-family: 'Exo', sans-serif;
+}
+.gallery-text h4{
+  padding: 10px;
+  color: #fffffffb;
+  font-family: 'Exo', sans-serif;
+  font-size: 85%;
+}
 .container img {
   display: block;
   margin-left: auto;
@@ -117,11 +152,29 @@
   object-fit: cover;
   border-radius: 10px;
 }
-/*Wallpaper for Gallery*/
+.container img:hover{
+  transform: scale(1.02);
+  cursor: pointer;
+}
+.info a:link{
+  text-decoration: none;
+}
+.info a:visited {
+  color: black;
+}
+.info a:hover {
+  color: rgb(236, 198, 71);
+}
+.info a:active {
+  color: black;
+}
+
+/*Styling for Gallery*/
 .main-container{
-  background-image: url("Tanks/bg.jpg");
+  padding: 50px;
+  background-image: url("Images/bg.jpg");
   background-size: cover;         
-  background-position: center;            
+  background-position: center;     
 }
 .main-container h1{
   color: white;
@@ -131,6 +184,8 @@
   text-align: center;
   background-color: rgba(0, 0, 0, 0.829);
   width: 150px;
+  font-family: 'Nanum Myeongjo', serif;
+  border: 2px solid #ffffff88;
 }
 .container {
   display: grid;
@@ -153,14 +208,43 @@
 .card .info {
   margin-left: auto;
   margin-right: auto;
+  margin-top: 4px;
   border-radius: 10px;
   background-color: rgba(255, 255, 255, 0.459);
   width: 300px;
-  padding: 0;
+  padding: 0px;
 }
 .card h2{
-  color: black;
-  margin-top:5px;
   text-align: center;
+  vertical-align: middle;
+}
+.flag-icon {
+  text-align: center;
+  vertical-align: middle;
+  margin-bottom: 4px;
+}
+.flag-icon-sun{
+  margin-top: 4px;
+}
+
+/* Custom Scroll Bar */
+.index-page, .gallery-page, .about-page{
+  overflow:overlay;
+}
+::-webkit-scrollbar {
+  width: 11px;
+  background-color: transparent;
+}
+::-webkit-scrollbar-track {
+  border-radius: 10px;
+
+}
+::-webkit-scrollbar-thumb {
+  background: #e0e0e0be;
+  border-radius: 10px;
+
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #88703bf6;
 }
 

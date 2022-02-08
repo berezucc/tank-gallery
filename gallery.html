@@ -1,13 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="gallery-page">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gallery</title>
     <link rel="stylesheet" href="styles.css">
+
+    <!-- Country Flag Icons -->
+    <link rel="stylesheet" href="flag-icons-master/css/flag-icon.css">
+
+    <!-- Lightbox Gallery -->
+    <link rel="stylesheet" href="lightbox.min.css">
+    <script src="lightbox-plus-jquery.min.js"></script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Exo&family=Nanum+Myeongjo:wght@700&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="body-container">
     <!-- Header -->
     <header>
         <!-- Navigation Bar -->
@@ -28,479 +40,491 @@
         </nav>
     </header>
     <!-- Introduction -->
-    <div class="gallery">
-        <h1>Gallery</h1>
+    <div class="gallery-parallax">
+    </div>
+    <div class="gallery-text">
+        <h1>Nikita's Armour Gallery</h1>
+        <h4>Collection of my photo's from travelling and exploring different military vehicles and equipment across Ontario</h4>
+        
     </div>
     <div class="main-container">
         <!-- WW1 -->
-        <h1>WW1</h1>
-        <div class="container" id="ww1">
+        <h1 id="ww1">WW1</h1>
+        <div class="container">
             <div class="card">
                 <div class="image m1917-image">
-                    <img src="Tanks/m1917.JPEG" alt="M1917 Tank">
+                    <a href="Tanks/m1917.JPEG" data-lightbox="ww1-gallery"><img src="Tanks/m1917.JPEG" alt="M1917 Tank"></a>
                 </div>
-                <div class="info m1917-info"> 
-                    <h2>M1917</h2>
+                <div class="info"> 
+                    <a href="https://en.wikipedia.org/wiki/M1917_light_tank" target="_blank"><h2><span class="flag-icon flag-icon-fra"></span><span class="flag-icon flag-icon-usa"></span>M1917</h2></a>
                 </div>
             </div>
             <div class="card">
                 <div class="image 7.7fk-image">
-                    <img src="Tanks/7.7feldkanone.jpeg" alt="7.7-cm Feldkanone">
+                    <a href="Tanks/7.7feldkanone.jpeg" data-lightbox="ww1-gallery"><img src="Tanks/7.7feldkanone.jpeg" alt="7.7-cm Feldkanone"> </a>
                 </div>
                 <div class="info 7.7fk-info">
-                    <h2>7.7-cm Feldkanone 16</h2>
+                    <a href="https://en.wikipedia.org/wiki/7.7_cm_FK_16" target="_blank"><h2><span class="flag-icon flag-icon-deu"></span>7.7-cm Feldkanone 16</h2> </a>
                 </div>
             </div>
             <div class="card">
                 <div class="image L40-image">
-                    <img src="Tanks/15feldkanone.jpg" alt="15-cm Feldkanone">
+                    <a href="Tanks/15feldkanone.jpg" data-lightbox="ww1-gallery"><img src="Tanks/15feldkanone.jpg" alt="15-cm Feldkanone"> </a>
                 </div>
                 <div class="info L40-info">
-                    <h2>15-cm Feldkanone L/40</h2>
+                    <a href="https://en.wikipedia.org/wiki/15_cm_L/40_Feldkanone_i.R." target="_blank"><h2><span class="flag-icon flag-icon-deu"></span>15-cm Feldkanone L/40</h2> </a>
                 </div>
             </div>
             <div class="card">
                 <div class="image L45-image">
-                    <img src="Tanks/15felkanone45.jpeg" alt="15-cm Feldkanone">
+                    <a href="Tanks/15felkanone45.jpeg" data-lightbox="ww1-gallery"><img src="Tanks/15felkanone45.jpeg" alt="15-cm Feldkanone"> </a>
                 </div>
                 <div class="info L45-info">
-                    <h2>15-cm Feldkanone L/45</h2>
+                    <a href="https://en.wikipedia.org/wiki/15_cm_L/40_Feldkanone_i.R." target="_blank"><h2><span class="flag-icon flag-icon-deu"></span>15-cm Feldkanone L/45</h2> </a>
                 </div>
             </div>
         </div>
         <!-- WW2 -->
-        <h1>WW2</h1>
-        <div class="container" id="ww2">
+        <h1 id="ww2">WW2</h1>
+        <div class="container">
             <div class="card">
                 <div class="image chaffee-image">
-                    <img src="Tanks/chaffee.JPEG" alt="Chaffee Tank">
+                    <a href="Tanks/chaffee.JPEG" data-lightbox="ww2-gallery"><img src="Tanks/chaffee.JPEG" alt="Chaffee Tank"> </a>
                 </div>
                 <div class="info chaffee-info">
-                    <h2>Chaffee</h2>
+                    <a href="https://en.wikipedia.org/wiki/M24_Chaffee" target="_blank"><h2><span class="flag-icon flag-icon-usa"></span>Chaffee</h2> </a>
                 </div>
             </div>
             <div class="card">
                 <div class="image chaffee2-image">
-                    <img src="Tanks/chaffee.JPG" alt="Chaffee Tank">
+                    <a href="Tanks/chaffee.JPG" data-lightbox="ww2-gallery"><img src="Tanks/chaffee.JPG" alt="Chaffee Tank"> </a>
                 </div>
                 <div class="info chaffee2-info">
-                    <h2>Chaffee</h2>
-                </div>
-            </div>
-            <div class="card">
-                <div class="image churchill-image">
-                    <img src="Tanks/churchill (2).JPG" alt="Churchill Tank">
-                </div>
-                <div class="info churchill-info">
-                    <h2>Churchill</h2>
-                </div>
-            </div>
-            <div class="card">
-                <div class="image churchill2-image">
-                    <img src="Tanks/churchill.jpg" alt="Churchill Tank">
-                </div>
-                <div class="info churchill2-info">
-                    <h2>Churchill</h2>
-                </div>
-            </div>
-            <div class="card">
-                <div class="image churchill3-image">
-                    <img src="Tanks/churchill (3).JPG" alt="Churchill Tank">
-                </div>
-                <div class="info churchill3-info">
-                    <h2>Churchill</h2>
-                </div>
-            </div>
-            <div class="card">
-                <div class="image crab-image">
-                    <img src="Tanks/crab.JPG" alt="M4 Sherman Crab Tank">
-                </div>
-                <div class="info crab-info">
-                    <h2>M4 Sherman Crab</h2>
-                </div>
-            </div>    
-            <div class="card">
-                <div class="image ferret-image">
-                    <img src="Tanks/ferret.JPG" alt="Ferret Tank">
-                </div>
-                <div class="info ferret-info">
-                    <h2>Ferret</h2>
-                </div>
-            </div>
-            <div class="card">
-                <div class="image firefly-image">
-                    <img src="Tanks/firefly.JPG" alt="Firefly Tank">
-                </div>
-                <div class="info firefly-info">
-                    <h2>Sherman Firefly</h2>
-                </div>
-            </div>    
-            <div class="card">
-                <div class="image hetzer-image">
-                    <img src="Tanks/hetzer.jpg" alt="Hetzer Tank">
-                </div>
-                <div class="info hetzer-info">
-                    <h2>Hetzer</h2>
-                </div>
-            </div>
-            <div class="card">
-                <div class="image jagd-image">
-                    <img src="Tanks/crab.JPG" alt="Jagdpanzer 4 Tank">
-                </div>
-                <div class="info jagd-info">
-                    <h2>Jagdpanzer IV</h2>
-                </div>
-            </div>    
-            <div class="card">
-                <div class="image m3-image">
-                    <img src="Tanks/m3lee.JPG" alt="M3 Lee Tank">
-                </div>
-                <div class="info m3-info">
-                    <h2>M3 Lee</h2>
-                </div>
-            </div>    
-            <div class="card">
-                <div class="image m32-image">
-                    <img src="Tanks/m3lee (2).JPG" alt="M3 Lee Tank">
-                </div>
-                <div class="info m32-info">
-                    <h2>M3 Lee</h2>
-                </div>
-            </div>   
-            <div class="card">
-                <div class="image m4-image">
-                    <img src="Tanks/m4.JPG" alt="M4 Sherman Tank">
-                </div>
-                <div class="info m4-info">
-                    <h2>M4 Sherman</h2>
-                </div>
-            </div>
-            <div class="card">
-                <div class="image m42-image">
-                    <img src="Tanks/m4 (2).JPG" alt="M4 Sherman Tank">
-                </div>
-                <div class="info m42-info">
-                    <h2>M4 Sherman</h2>
+                    <a href="https://en.wikipedia.org/wiki/M24_Chaffee" target="_blank"><h2><span class="flag-icon flag-icon-usa"></span>Chaffee</h2> </a>
                 </div>
             </div>
             <div class="card">
                 <div class="image m5-image">
-                    <img src="Tanks/m5.jpg" alt="M5 Stuart Tank">
+                    <a href="Tanks/m5.jpg" data-lightbox="ww2-gallery"><img src="Tanks/m5.jpg" alt="M5 Stuart Tank"> </a>
                 </div>
                 <div class="info m5-info">
-                    <h2>M5 Stuart</h2>
+                    <a href="https://en.wikipedia.org/wiki/M3_Stuart" target="_blank"><h2><span class="flag-icon flag-icon-usa"></span>M5 Stuart</h2> </a>
+                </div>
+            </div>  
+            <div class="card">
+                <div class="image m3-image">
+                    <a href="Tanks/m3lee.JPG" data-lightbox="ww2-gallery"><img src="Tanks/m3lee.JPG" alt="M3 Lee Tank"> </a>
+                </div>
+                <div class="info m3-info">
+                    <a href="https://en.wikipedia.org/wiki/M3_Lee" target="_blank"><h2><span class="flag-icon flag-icon-usa"></span>M3 Lee</h2> </a>
+                </div>
+            </div>    
+            <div class="card">
+                <div class="image m32-image">
+                    <a href="Tanks/m3lee (2).JPG" data-lightbox="ww2-gallery"><img src="Tanks/m3lee (2).JPG" alt="M3 Lee Tank"> </a>
+                </div>
+                <div class="info m32-info">
+                    <a href="https://en.wikipedia.org/wiki/M3_Lee" target="_blank"><h2><span class="flag-icon flag-icon-usa"></span>M3 Lee</h2> </a>
+                </div>
+            </div>   
+            <div class="card">
+                <div class="image m4-image">
+                    <a href="Tanks/m4.JPG" data-lightbox="ww2-gallery"><img src="Tanks/m4.JPG" alt="M4 Sherman Tank"> </a>
+                </div>
+                <div class="info m4-info">
+                    <a href="https://en.wikipedia.org/wiki/M4_Sherman" target="_blank"><h2><span class="flag-icon flag-icon-usa"></span><span class="flag-icon flag-icon-can"></span>M4 Sherman</h2> </a>
                 </div>
             </div>
             <div class="card">
-                <div class="image m1441-image">
-                    <img src="Tanks/m1441.jpg" alt="M1441 Tank">
+                <div class="image m42-image">
+                    <a href="Tanks/m4 (2).JPG" data-lightbox="ww2-gallery"><img src="Tanks/m4 (2).JPG" alt="M4 Sherman Tank"> </a>
                 </div>
-                <div class="info m1441-info">
-                    <h2>M 14/41</h2>
+                <div class="info m42-info">
+                    <a href="https://en.wikipedia.org/wiki/M4_Sherman" target="_blank"><h2><span class="flag-icon flag-icon-usa"></span><span class="flag-icon flag-icon-can"></span>M4 Sherman</h2> </a>
+                </div>
+            </div>
+            <div class="card">
+                <div class="image crab-image">
+                    <a href="Tanks/crab.JPG" data-lightbox="ww2-gallery"><img src="Tanks/crab.JPG" alt="M4 Sherman Crab Tank"> </a>
+                </div>
+                <div class="info crab-info">
+                    <a href="https://en.wikipedia.org/wiki/Mine_flail" target="_blank"><h2><span class="flag-icon flag-icon-usa"></span><span class="flag-icon flag-icon-can"></span>M4 Sherman Crab</h2> </a>
+                </div>
+            </div>    
+            <div class="card">
+                <div class="image firefly-image">
+                    <a href="Tanks/firefly.JPG" data-lightbox="ww2-gallery"><img src="Tanks/firefly.JPG" alt="Firefly Tank"> </a>
+                </div>
+                <div class="info firefly-info">
+                    <a href="https://en.wikipedia.org/wiki/Sherman_Firefly" target="_blank"><h2><span class="flag-icon flag-icon-gbr"></span>Sherman Firefly</h2> </a>
+                </div>
+            </div>   
+            <div class="card">
+                <div class="image ram2-image">
+                    <a href="Tanks/ram2.jpg" data-lightbox="ww2-gallery"><img src="Tanks/ram2.jpg" alt="Ram2Tank"> </a>
+                </div>
+                <div class="info ram2-info">
+                    <a href="https://en.wikipedia.org/wiki/Ram_tank" target="_blank"><h2><span class="flag-icon flag-icon-can"></span>Ram 2</h2> </a>
                 </div>
             </div>
             <div class="card">
                 <div class="image matilda-image">
-                    <img src="Tanks/matilda.jpg" alt="Matilda Tank">
+                    <a href="Tanks/matilda.jpg" data-lightbox="ww2-gallery"><img src="Tanks/matilda.jpg" alt="Matilda Tank"> </a>
                 </div>
                 <div class="info matilda-info">
-                    <h2>Matilda</h2>
-                </div>
-            </div>
-            <div class="card">
-                <div class="image panther-image">
-                    <img src="Tanks/panther.JPG" alt="Panther Tank">
-                </div>
-                <div class="info panther-info">
-                    <h2>Panther</h2>
-                </div>
-            </div>
-            <div class="card">
-                <div class="image pz2-image">
-                    <img src="Tanks/pz2.JPG" alt="Panzer II Tank">
-                </div>
-                <div class="info pz2-info">
-                    <h2>Panzer II</h2>
-                </div>
-            </div>
-            <div class="card">
-                <div class="image ram2-image">
-                    <img src="Tanks/ram2.jpg" alt="Ram2Tank">
-                </div>
-                <div class="info ram2-info">
-                    <h2>Ram 2</h2>
-                </div>
-            </div>
-            <div class="card">
-                <div class="image sexton-image">
-                    <img src="Tanks/sexton.jpg" alt="Sexton Artillery">
-                </div>
-                <div class="info sexton-info">
-                    <h2>Sexton</h2>
-                </div>
-            </div>
-            <div class="card">
-                <div class="image stug3-image">
-                    <img src="Tanks/stug3.JPG" alt="Stug III Tank">
-                </div>
-                <div class="info stug3-info">
-                    <h2>Sturmgeschütz III</h2>
-                </div>
-            </div>    
-            <div class="card">
-                <div class="image t34-image">
-                    <img src="Tanks/t3485.jpg" alt="T-34-85 Tank">
-                </div>
-                <div class="info t34-info">
-                    <h2>T-34-85</h2>
-                </div>
-            </div>
-            <div class="card">
-                <div class="image t342-image">
-                    <img src="Tanks/t3485 (2).JPG" alt="T-34-85 Tank">
-                </div>
-                <div class="info t342-info">
-                    <h2>T-34-85</h2>
+                    <a href="https://en.wikipedia.org/wiki/Matilda_II" target="_blank"><h2><span class="flag-icon flag-icon-gbr"></span>Matilda II</h2> </a>
                 </div>
             </div>
             <div class="card">
                 <div class="image valentine-image">
-                    <img src="Tanks/valentine (2).JPG" alt="Valentine Tank">
+                    <a href="Tanks/valentine (2).JPG" data-lightbox="ww2-gallery"><img src="Tanks/valentine (2).JPG" alt="Valentine Tank"> </a>
                 </div>
                 <div class="info valentine-info">
-                    <h2>Valentine</h2>
+                    <a href="https://en.wikipedia.org/wiki/Valentine_tank" target="_blank"><h2><span class="flag-icon flag-icon-gbr"></span>Valentine</h2> </a>
                 </div>
             </div>
             <div class="card">
                 <div class="image valentine2-image">
-                    <img src="Tanks/valentine.jpg" alt="Valentine Tank">
+                    <a href="Tanks/valentine.jpg" data-lightbox="ww2-gallery"><img src="Tanks/valentine.jpg" alt="Valentine Tank"> </a>
                 </div>
                 <div class="info valentine2-info">
-                    <h2>Valentine</h2>
+                    <a href="https://en.wikipedia.org/wiki/Valentine_tank" target="_blank"><h2><span class="flag-icon flag-icon-gbr"></span>Valentine</h2> </a>
                 </div>
             </div>
             <div class="card">
+                <div class="image churchill-image">
+                    <a href="Tanks/churchill (2).JPG" data-lightbox="ww2-gallery"><img src="Tanks/churchill (2).JPG" alt="Churchill Tank"> </a>
+                </div>
+                <div class="info churchill-info">
+                    <a href="https://en.wikipedia.org/wiki/Churchill_tank" target="_blank"> <h2><span class="flag-icon flag-icon-gbr"></span>Churchill</h2> </a>
+                </div>
+            </div>
+            <div class="card">
+                <div class="image churchill2-image">
+                    <a href="Tanks/churchill.jpg" data-lightbox="ww2-gallery"><img src="Tanks/churchill.jpg" alt="Churchill Tank"> </a>
+                </div>
+                <div class="info churchill2-info">
+                    <a href="https://en.wikipedia.org/wiki/Churchill_tank" target="_blank"> <h2><span class="flag-icon flag-icon-gbr"></span>Churchill</h2></a>
+                </div>
+            </div>
+            <div class="card">
+                <div class="image churchill3-image">
+                    <a href="Tanks/churchill (3).JPG" data-lightbox="ww2-gallery"><img src="Tanks/churchill (3).JPG" alt="Churchill Tank"> </a>
+                </div>
+                <div class="info churchill3-info">
+                    <a href="https://en.wikipedia.org/wiki/Churchill_tank" target="_blank"><h2><span class="flag-icon flag-icon-gbr"></span>Churchill</h2> </a>
+                </div>
+            </div>
+            <div class="card">
+                <div class="image sexton-image">
+                    <a href="Tanks/sexton.jpg" data-lightbox="ww2-gallery"><img src="Tanks/sexton.jpg" alt="Sexton Artillery"> </a>
+                </div>
+                <div class="info sexton-info">
+                    <a href="https://en.wikipedia.org/wiki/Sexton_(artillery)" target="_blank"><h2><span class="flag-icon flag-icon-gbr"></span><span class="flag-icon flag-icon-can"></span>Sexton</h2> </a>
+                </div>
+            </div>  
+            <div class="card">
+                <div class="image ferret-image">
+                    <a href="Tanks/ferret.JPG" data-lightbox="ww2-gallery"><img src="Tanks/ferret.JPG" alt="Ferret Tank"> </a>
+                </div>
+                <div class="info ferret-info">
+                    <a href="https://en.wikipedia.org/wiki/Ferret_armoured_car#:~:text=The%20Ferret%20armoured%20car%2C%20also,by%20the%20UK%20company%20Daimler." target="_blank"><h2><span class="flag-icon flag-icon-gbr"></span>Ferret</h2> </a>
+                </div>
+            </div>
+            <div class="card">
+                <div class="image t34-image">
+                    <a href="Tanks/t3485.jpg" data-lightbox="ww2-gallery"><img src="Tanks/t3485.jpg" alt="T-34-85 Tank"> </a>
+                </div>
+                <div class="info t34-info">
+                    <a href="https://en.wikipedia.org/wiki/T-34" target="_blank"><h2><span class="flag-icon flag-icon-sun"></span>T-34-85</h2> </a>
+                </div>
+            </div>
+            <div class="card">
+                <div class="image t342-image">
+                    <a href="Tanks/t3485 (2).JPG" data-lightbox="ww2-gallery"><img src="Tanks/t3485 (2).JPG" alt="T-34-85 Tank"> </a>
+                </div>
+                <div class="info t342-info">
+                    <a href="https://en.wikipedia.org/wiki/T-34" target="_blank"><h2><span class="flag-icon flag-icon-sun"></span>T-34-85</h2> </a>
+                </div>
+            </div>
+            <div class="card">
+                <div class="image m1441-image">
+                    <a href="Tanks/m1441.jpg" data-lightbox="ww2-gallery"><img src="Tanks/m1441.jpg" alt="M1441 Tank"> </a>
+                </div>
+                <div class="info m1441-info">
+                    <a href="https://en.wikipedia.org/wiki/M14/41_tank" target="_blank"><h2><span class="flag-icon flag-icon-ita"></span>M 14/41</h2> </a>
+                </div>
+            </div>
+            <div class="card">
+                <div class="image pz2-image">
+                    <a href="Tanks/pz2.JPG" data-lightbox="ww2-gallery"><img src="Tanks/pz2.JPG" alt="Panzer II Tank"> </a>
+                </div>
+                <div class="info pz2-info">
+                    <a href="https://en.wikipedia.org/wiki/Panzer_II" target="_blank"><h2><span class="flag-icon flag-icon-deu"></span>Panzer II</h2> </a>
+                </div>
+            </div>
+            <div class="card">
+                <div class="image panther-image">
+                    <a href="Tanks/panther.JPG" data-lightbox="ww2-gallery"><img src="Tanks/panther.JPG" alt="Panther Tank"> </a>
+                </div>
+                <div class="info panther-info">
+                    <a href="https://en.wikipedia.org/wiki/Panther_tank" target="_blank"><h2><span class="flag-icon flag-icon-deu"></span>Panther</h2> </a>
+                </div>
+            </div>
+            <div class="card">
+                <div class="image stug3-image">
+                    <a href="Tanks/stug3.JPG" data-lightbox="ww2-gallery"><img src="Tanks/stug3.JPG" alt="Stug III Tank"> </a>
+                </div>
+                <div class="info stug3-info">
+                    <a href="https://en.wikipedia.org/wiki/Sturmgesch%C3%BCtz_III" target="_blank"><h2><span class="flag-icon flag-icon-deu"></span>Sturmgeschütz III</h2> </a>
+                </div>
+            </div>  
+            <div class="card">
+                <div class="image hetzer-image">
+                    <a href="Tanks/hetzer.jpg" data-lightbox="ww2-gallery"><img src="Tanks/hetzer.jpg" alt="Hetzer Tank"> </a>
+                </div>
+                <div class="info hetzer-info">
+                    <a href="https://en.wikipedia.org/wiki/Hetzer" target="_blank"><h2><span class="flag-icon flag-icon-deu"></span>Hetzer</h2> </a>
+                </div>
+            </div>
+            <div class="card">
+                <div class="image jagd-image">
+                    <a href="Tanks/jgd4.JPG" data-lightbox="ww2-gallery"><img src="Tanks/jgd4.JPG" alt="Jagdpanzer 4 Tank"> </a>
+                </div>
+                <div class="info jagd-info">
+                    <a href="https://en.wikipedia.org/wiki/Jagdpanzer_IV" target="_blank"><h2><span class="flag-icon flag-icon-deu"></span>Jagdpanzer IV</h2> </a>
+                </div>
+            </div>   
+            <div class="card">
                 <div class="image wirbel-image">
-                    <img src="Tanks/wirblewind.jpg" alt="Wirbelwind Anti-Aircraft Tank">
+                    <a href="Tanks/wirblewind.jpg" data-lightbox="ww2-gallery"><img src="Tanks/wirblewind.jpg" alt="Wirbelwind Anti-Aircraft Tank"> </a>
                 </div>
                 <div class="info wirbel-info">
-                    <h2>Wirbelwind</h2>
+                    <a href="https://en.wikipedia.org/wiki/Wirbelwind" target="_blank"><h2><span class="flag-icon flag-icon-deu"></span>Wirbelwind</h2> </a>
                 </div>
             </div>
             <div class="card">
                 <div class="image tiger-image">
-                    <img src="Tanks/tigergun.jpg" alt="Tiger Tank Cannon">
+                    <a href="Tanks/tigergun.jpg" data-lightbox="ww2-gallery"><img src="Tanks/tigergun.jpg" alt="Tiger Tank Cannon"> </a>
                 </div>
                 <div class="info tiger-info">
-                    <h2>Tiger Tank Cannon</h2>
+                    <a href="https://en.wikipedia.org/wiki/8.8_cm_KwK_36" target="_blank"><h2><span class="flag-icon flag-icon-deu"></span>8.8 cm KwK 36</h2> </a>
                 </div>
             </div>
         </div>
         <!-- Cold War -->
-        <h1>Cold War</h1>
-        <div class="container" id="cold-war">
+        <h1 id="cold-war">Cold War</h1>
+        <div class="container">
             <div class="card">
                 <div class="image centurion-image">
-                    <img src="Tanks/centurion.JPG" alt="Centurion Tank">
+                    <a href="Tanks/centurion.JPG" data-lightbox="cold-gallery"><img src="Tanks/centurion.JPG" alt="Centurion Tank"> </a>
                 </div>
                 <div class="info centurion-info">
-                    <h2>Centurion</h2>
+                    <a href="https://en.wikipedia.org/wiki/Centurion_(tank)" target="_blank"><h2><span class="flag-icon flag-icon-gbr"></span><span class="flag-icon flag-icon-can"></span>Centurion</h2> </a>
                 </div>
             </div>
             <div class="card">
                 <div class="image centurion2-image">
-                    <img src="Tanks/centurion (2).JPG" alt="Centurion Tank">
+                    <a href="Tanks/centurion (2).JPG" data-lightbox="cold-gallery"><img src="Tanks/centurion (2).JPG" alt="Centurion Tank"> </a>
                 </div>
                 <div class="info centurion2-info">
-                    <h2>Centurion</h2>
+                    <a href="https://en.wikipedia.org/wiki/Centurion_(tank)" target="_blank"><h2><span class="flag-icon flag-icon-gbr"></span><span class="flag-icon flag-icon-can"></span>Centurion</h2> </a>
                 </div>
             </div>
             <div class="card">
                 <div class="image chieftan-image">
-                    <img src="Tanks/chieftan.JPG" alt="Chieftan Tank">
+                    <a href="Tanks/chieftan.JPG" data-lightbox="cold-gallery"><img src="Tanks/chieftan.JPG" alt="Chieftan Tank"> </a>
                 </div>
                 <div class="info chieftan-info">
-                    <h2>Chieftan Mk. 10</h2>
+                    <a href="https://en.wikipedia.org/wiki/Chieftain_(tank)" target="_blank"><h2><span class="flag-icon flag-icon-gbr"></span>Chieftan Mk. 10</h2> </a>
                 </div>
             </div>
             <div class="card">
                 <div class="image leopard1-image">
-                    <img src="Tanks/leopard1.jpg" alt="Leopard 1 Tank">
+                    <a href="Tanks/leopard1.jpg" data-lightbox="cold-gallery"><img src="Tanks/leopard1.jpg" alt="Leopard 1 Tank"> </a>
                 </div>
                 <div class="info leopard1-info">
-                    <h2>Leopard 1</h2>
+                    <a href="https://en.wikipedia.org/wiki/Leopard_1" target="_blank"><h2><span class="flag-icon flag-icon-deu"></span><span class="flag-icon flag-icon-can"></span>Leopard C1</h2> </a>
                 </div>
             </div>
             <div class="card">
                 <div class="image leopard12-image">
-                    <img src="Tanks/leopard1 (2).JPG" alt="Leopard 1 Tank">
+                    <a href="Tanks/leopard1 (2).JPG" data-lightbox="cold-gallery"><img src="Tanks/leopard1 (2).JPG" alt="Leopard 1 Tank"> </a>
                 </div>
                 <div class="info leopard12-info">
-                    <h2>Leopard 1</h2>
-                </div>
-            </div>
-            <div class="card">
-                <div class="image lav-image">
-                    <img src="Tanks/lav.jpg" alt="Lav III APC">
-                </div>
-                <div class="info lav-info">
-                    <h2>LAV III</h2>
-                </div>
-            </div>
-            <div class="card">
-                <div class="image lav2-image">
-                    <img src="Tanks/lav (2).JPG" alt="Lav III APC">
-                </div>
-                <div class="info lav2-info">
-                    <h2>LAV III</h2>
-                </div>
-            </div>
-            <div class="card">
-                <div class="image m60-image">
-                    <img src="Tanks/m60.jpg" alt="M60 Tank">
-                </div>
-                <div class="info m60-info">
-                    <h2>M60</h2>
-                </div>
-            </div>
-            <div class="card">
-                <div class="image m602-image">
-                    <img src="Tanks/m60 (2).JPG" alt="M60 Tank">
-                </div>
-                <div class="info m602-info">
-                    <h2>M60</h2>
-                </div>
-            </div>
-            <div class="card">
-                <div class="image m603-image">
-                    <img src="Tanks/m60 (3).JPG" alt="M60 Tank">
-                </div>
-                <div class="info m603-info">
-                    <h2>M60</h2>
-                </div>
-            </div>
-            <div class="card">
-                <div class="image m109-image">
-                    <img src="Tanks/m109.JPG" alt="M109">
-                </div>
-                <div class="info m109-info">
-                    <h2>M109</h2>
-                </div>
-            </div>
-            <div class="card">
-                <div class="image m577a3-image">
-                    <img src="Tanks/m577a3.JPG" alt="M577a3">
-                </div>
-                <div class="info m577a3-info">
-                    <h2>M577a3</h2>
-                </div>
-            </div>
-            <div class="card">
-                <div class="image m113-image">
-                    <img src="Tanks/m1113.JPG" alt="M113">
-                </div>
-                <div class="info m5577a3-info">
-                    <h2>M113</h2>
-                </div>
-            </div>
-            <div class="card">
-                <div class="image m1132-image">
-                    <img src="Tanks/m1113 (2).JPG" alt="M113">
-                </div>
-                <div class="info m1132-info">
-                    <h2>M113</h2>
+                    <a href="https://en.wikipedia.org/wiki/Leopard_1" target="_blank"><h2><span class="flag-icon flag-icon-deu"></span><span class="flag-icon flag-icon-can"></span>Leopard C2</h2> </a>
                 </div>
             </div>
             <div class="card">
                 <div class="image sabre-image">
-                    <img src="Tanks/sabre.JPG" alt="sabre">
+                    <a href="Tanks/sabre.JPG" data-lightbox="cold-gallery"><img src="Tanks/sabre.JPG" alt="sabre"> </a>
                 </div>
                 <div class="info sabre-info">
-                    <h2>Sabre</h2>
+                    <a href="https://en.wikipedia.org/wiki/Sabre_(tank)" target="_blank"><h2><span class="flag-icon flag-icon-gbr"></span>CVR(T) Sabre</h2> </a>
+                </div>
+            </div>
+            <div class="card">
+                <div class="image lav-image">
+                    <a href="Tanks/lav.jpg" data-lightbox="cold-gallery"><img src="Tanks/lav.jpg" alt="Lav III APC"> </a>
+                </div>
+                <div class="info lav-info">
+                    <a href="https://en.wikipedia.org/wiki/LAV_III" target="_blank"><h2><span class="flag-icon flag-icon-can"></span>LAV III</h2> </a>
+                </div>
+            </div>
+            <div class="card">
+                <div class="image lav2-image">
+                    <a href="Tanks/lav (2).JPG" data-lightbox="cold-gallery"><img src="Tanks/lav (2).JPG" alt="Lav III APC"> </a>
+                </div>
+                <div class="info lav2-info">
+                    <a href="https://en.wikipedia.org/wiki/LAV_III" target="_blank"><h2><span class="flag-icon flag-icon-can"></span>LAV III</h2> </a>
+                </div>
+            </div>
+            <div class="card">
+                <div class="image lav3-image">
+                    <a href="Tanks/lav(3).jpg" data-lightbox="cold-gallery"><img src="Tanks/lav(3).jpg" alt="Lav III APC"> </a>
+                </div>
+                <div class="info lav3-info">
+                    <a href="https://en.wikipedia.org/wiki/LAV_III" target="_blank"><h2><span class="flag-icon flag-icon-can"></span>LAV III</h2> </a>
+                </div>
+            </div>
+            <div class="card">
+                <div class="image m60-image">
+                    <a href="Tanks/m60.jpg" data-lightbox="cold-gallery"><img src="Tanks/m60.jpg" alt="M60 Tank"> </a>
+                </div>
+                <div class="info m60-info">
+                    <a href="https://en.wikipedia.org/wiki/M60_tank" target="_blank"><h2><span class="flag-icon flag-icon-usa"></span>M60a3</h2> </a>
+                </div>
+            </div>
+            <div class="card">
+                <div class="image m602-image">
+                    <a href="Tanks/m60 (2).JPG" data-lightbox="cold-gallery"><img src="Tanks/m60 (2).JPG" alt="M60 Tank"> </a>
+                </div>
+                <div class="info m602-info">
+                    <a href="https://en.wikipedia.org/wiki/M60_tank" target="_blank"><h2><span class="flag-icon flag-icon-usa"></span>M60a3</h2> </a>
+                </div>
+            </div>
+            <div class="card">
+                <div class="image m603-image">
+                    <a href="Tanks/m60 (3).JPG" data-lightbox="cold-gallery"><img src="Tanks/m60 (3).JPG" alt="M60 Tank"> </a>
+                </div>
+                <div class="info m603-info">
+                    <a href="https://en.wikipedia.org/wiki/M60_tank" target="_blank"><h2><span class="flag-icon flag-icon-usa"></span>M60a3</h2> </a>
+                </div>
+            </div>
+            <div class="card">
+                <div class="image m109-image">
+                    <a href="Tanks/m109.JPG" data-lightbox="cold-gallery"><img src="Tanks/m109.JPG" alt="M109"> </a>
+                </div>
+                <div class="info m109-info">
+                    <a href="https://en.wikipedia.org/wiki/M109_howitzer" target="_blank"><h2><span class="flag-icon flag-icon-usa"></span><span class="flag-icon flag-icon-can"></span>M109 Paladin</h2> </a>
+                </div>
+            </div>
+            <div class="card">
+                <div class="image m577a3-image">
+                    <a href="Tanks/m577a3.JPG" data-lightbox="cold-gallery"><img src="Tanks/m577a3.JPG" alt="M577a3"> </a>
+                </div>
+                <div class="info m577a3-info">
+                    <a href="https://en.wikipedia.org/wiki/M577_Command_Post_Carrier" target="_blank"><h2><span class="flag-icon flag-icon-usa"></span><span class="flag-icon flag-icon-can"></span>M577a3</h2> </a>
+                </div>
+            </div>
+            <div class="card">
+                <div class="image m113-image">
+                    <a href="Tanks/m1113.JPG" data-lightbox="cold-gallery"><img src="Tanks/m1113.JPG" alt="M113"> </a>
+                </div>
+                <div class="info m5577a3-info">
+                    <a href="https://en.wikipedia.org/wiki/M113_armored_personnel_carrier" target="_blank"><h2><span class="flag-icon flag-icon-usa"></span>M113</h2> </a>
+                </div>
+            </div>
+            <div class="card">
+                <div class="image m1132-image">
+                    <a href="Tanks/m1113 (2).JPG" data-lightbox="cold-gallery"><img src="Tanks/m1113 (2).JPG" alt="M113"> </a>
+                </div>
+                <div class="info m1132-info">
+                    <a href="https://en.wikipedia.org/wiki/M113_armored_personnel_carrier" target="_blank"><h2><span class="flag-icon flag-icon-usa"></span>M113</h2> </a>
                 </div>
             </div>
             <div class="card">
                 <div class="image sheridan-image">
-                    <img src="Tanks/sheridan.jpeg" alt="sheridan">
-                </div>
-                <div class="info sabre-info">
-                    <h2>Sheridan</h2>
-                </div>
-            </div>
-            <div class="card">
-                <div class="image sheridan-image">
-                    <img src="Tanks/sheridan.JPG" alt="sheridan">
+                    <a href="Tanks/sheridan.jpeg" data-lightbox="cold-gallery"><img src="Tanks/sheridan.jpeg" alt="sheridan"> </a>
                 </div>
                 <div class="info sheridan-info">
-                    <h2>Sheridan</h2>
+                    <a href="https://en.wikipedia.org/wiki/M551_Sheridan" target="_blank"><h2><span class="flag-icon flag-icon-usa"></span>M551 Sheridan</h2> </a>
+                </div>
+            </div>
+            <div class="card">
+                <div class="image sheridan-image">
+                    <a href="Tanks/sheridan.JPG" data-lightbox="cold-gallery"><img src="Tanks/sheridan.JPG" alt="sheridan"> </a>
+                </div>
+                <div class="info sheridan-info">
+                    <a href="https://en.wikipedia.org/wiki/M551_Sheridan" target="_blank"><h2><span class="flag-icon flag-icon-usa"></span>M551 Sheridan</h2> </a>
                 </div>
             </div>
             <div class="card">
                 <div class="image t55-image">
-                    <img src="Tanks/t55.jpg" alt="t55">
+                    <a href="Tanks/t55.jpg" data-lightbox="cold-gallery"><img src="Tanks/t55.jpg" alt="t55"> </a>
                 </div>
                 <div class="info t55-info">
-                    <h2>T-55</h2>
-                </div>
-            </div>
-            <div class="card">
-                <div class="image t72-image">
-                    <img src="Tanks/t72.jpg" alt="t72">
-                </div>
-                <div class="info t72-info">
-                    <h2>T-72</h2>
-                </div>
-            </div>
-            <div class="card">
-                <div class="image t722-image">
-                    <img src="Tanks/t72 (2).JPG" alt="t72">
-                </div>
-                <div class="info t722-info">
-                    <h2>T-72</h2>
+                    <a href="https://en.wikipedia.org/wiki/T-54/T-55" target="_blank"><h2><span class="flag-icon flag-icon-sun"></span>T-55</h2> </a>
                 </div>
             </div>
             <div class="card">
                 <div class="image tr85-image">
-                    <img src="Tanks/tr85.JPEG" alt="tr85">
+                    <a href="Tanks/tr85.JPEG" data-lightbox="cold-gallery"><img src="Tanks/tr85.JPEG" alt="tr85"> </a>
                 </div>
                 <div class="info tr85-info">
-                    <h2>TR-85</h2>
+                    <a href="https://en.wikipedia.org/wiki/TR-85" target="_blank"><h2><span class="flag-icon flag-icon-sun"></span>TR-85</h2> </a>
+                </div>
+            </div>
+            <div class="card">
+                <div class="image t72-image">
+                    <a href="Tanks/t72.jpg" data-lightbox="cold-gallery"><img src="Tanks/t72.jpg" alt="t72"> </a>
+                </div>
+                <div class="info t72-info">
+                    <a href="https://en.wikipedia.org/wiki/T-72" target="_blank"><h2><span class="flag-icon flag-icon-sun"></span>T-72</h2> </a>
+                </div>
+            </div>
+            <div class="card">
+                <div class="image t722-image">
+                    <a href="Tanks/t72 (2).JPG" data-lightbox="cold-gallery"><img src="Tanks/t72 (2).JPG" alt="t72"> </a>
+                </div>
+                <div class="info t722-info">
+                    <a href="https://en.wikipedia.org/wiki/T-72" target="_blank"><h2><span class="flag-icon flag-icon-sun"></span>T-72</h2> </a>
                 </div>
             </div>
         </div>
         <!-- Aircraft -->
-        <h1>Aircraft</h1>
-        <div class="container" id="Aircraft">
+        <h1 id="Aircraft">Aircraft</h1>
+        <div class="container">
             <div class="card">
                 <div class="image f86-image">
-                    <img src="Tanks/f86.jpg" alt="f86">
+                    <a href="Tanks/f86.jpg" data-lightbox="air-gallery"><img src="Tanks/f86.jpg" alt="f86"> </a>
                 </div>
                 <div class="info f86-info">
-                    <h2>F-86 Sabre</h2>
+                    <a href="https://en.wikipedia.org/wiki/North_American_F-86_Sabre" target="_blank"><h2><span class="flag-icon flag-icon-usa"></span><span class="flag-icon flag-icon-can"></span>F-86 Sabre</h2> </a>
                 </div>
             </div>
             <div class="card">
                 <div class="image f862-image">
-                    <img src="Tanks/f86 (2).JPG" alt="f86">
+                    <a href="Tanks/f86 (2).JPG" data-lightbox="air-gallery"><img src="Tanks/f86 (2).JPG" alt="f86"> </a>
                 </div>
                 <div class="info f862-info">
-                    <h2>F-86 Sabre</h2>
+                    <a href="https://en.wikipedia.org/wiki/North_American_F-86_Sabre" target="_blank"><h2><span class="flag-icon flag-icon-usa"></span><span class="flag-icon flag-icon-can"></span>F-86 Sabre</h2> </a>
                 </div>
             </div>
             <div class="card">
                 <div class="image mig15-image">
-                    <img src="Tanks/mig15.jpeg" alt="mig15">
+                    <a href="Tanks/mig15.jpeg" data-lightbox="air-gallery"><img src="Tanks/mig15.jpeg" alt="mig15"> </a>
                 </div>
                 <div class="info mig15-info">
-                    <h2>MiG-15</h2>
+                    <a href="https://en.wikipedia.org/wiki/Mikoyan-Gurevich_MiG-15" target="_blank"><h2><span class="flag-icon flag-icon-sun"></span>MiG-15</h2> </a>
                 </div>
             </div>
             <div class="card">
                 <div class="image cf116-image">
-                    <img src="Tanks/CF-116.jpg" alt="cf116">
+                    <a href="Tanks/CF-116.jpg" data-lightbox="air-gallery"><img src="Tanks/CF-116.jpg" alt="cf116"> </a>
                 </div>
                 <div class="info cf116-info">
-                    <h2>CF-116</h2>
+                    <a href="https://en.wikipedia.org/wiki/Canadair_CF-5" target="_blank"><h2><span class="flag-icon flag-icon-can"></span>CF-116</h2> </a>
                 </div>
             </div>
         </div>
