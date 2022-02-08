@@ -75,7 +75,7 @@ if (isset($_POST['Email'])) {
     mail($email_to, $email_subject, $email_subject, $headers);
 ?>
 
-    Thanks for contacting me. We will get in touch soon.
+    //Thanks for contacting me. We will get in touch soon.
 
 <?php
 }
