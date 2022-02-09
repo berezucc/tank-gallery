@@ -2,10 +2,11 @@
 <!DOCTYPE html>
 <html class="index-page">
     <head>
-        <title>Nikita's Collection</title>
-        <meta name="Description" content="Website Test by Nikita Berezyk">
+        <title>Nikita's Armour Gallery</title>
+        <meta name="Description" content="Tank Photo Gallery by Nikita Berezyk">
         <link rel="stylesheet" href="styles.css">
-
+        <link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@200&display=swap" rel="stylesheet">
+        <!-- https://css-tricks.com/animate-a-container-on-mouse-over-using-perspective-and-transform/ -->
     </head>
     <body>
         <!-- Header -->
@@ -29,69 +30,77 @@
         </header>
         <!-- Body -->
         <div class="home-page" id="home"> 
-            <h1 class="title">My Heading</h1>
+            <h1 class="title-text">My Heading</h1>
             <!-- Tank -->
             <video autoplay muted loop id="myVideo">
                 <source src="Tanks/T-72.mp4" type="video/mp4">
             </video>
             
-
         </div>
         <!-- Contact Page -->
-        <div class="contact-page" id="contact">
-            <a href="mailto:nikita@cntechmodel.biz">Send email</a>
-        </div>
-        <div class="form-container">
-        <!-- 
-            <form id="fcf-form-id" class="fcf-form-class" method="post" action="contact-form-process.php">
-                <label for="fname">Name</label>
-                <input type="text" id="Name" name="Name" placeholder="Your name...">
-                <label for="fname">Email</label>
-                <input type="text" id="Email" name="Email" placeholder="Your email...">
-                <label for="fname">Phone Number</label>
-                <input type="text" id="Phone" name="Phone" placeholder="Your phone number...">
-                <label for="fname">Subject</label>
-                <input type="text" id="Subject" name="Subject" placeholder="Write something...">
-
-                <input type="submit" value="Submit">
-            </form> -->
-            <form action="POST" data-netlify="true">
-                <label for="fname">Name</label>
-                <input type="text" id="Name" name="Name" placeholder="Your name...">
-                <label for="fname">Email</label>
-                <input type="text" id="Email" name="Email" placeholder="Your email...">
-                <label for="fname">Phone Number</label>
-                <input type="text" id="Phone" name="Phone" placeholder="Your phone number...">
-                <label for="fname">Subject</label>
-                <textarea name="Subject" id = "Subject" placeholder="Write something..." rows = "7"></textarea>
-
-                <input type="submit" value="Submit">
-            </form>
-        </div>
-        <!-- Footer-->
-        <footer class="footer-page">
-            <p>Footer</p>
-            <div class="socials"> 
+        <div class ="contact-container">
+            <div class="contact-page" id="contact">
+                <h1 id="contact-title">Get In Touch</h1><br>
+                <!-- Email -->
+                <a href="mailto:nikita@cntechmodel.biz" target="_blank" class="home home-email">
+                    <ion-icon name="mail-outline"></ion-icon>
+                </a><br>
                 <!-- Instagram -->
-                <a href="https://www.instagram.com/nikita.berezyuk/" target="_blank" class="fa fa-instagram">
+                <a href="https://www.instagram.com/nikita.berezyuk/" target="_blank" class="home home-instagram">
                     <ion-icon name="logo-instagram"></ion-icon>
-                </a>
+                </a><br>
                 <!-- LinkedIn -->
-                <a href="https://www.linkedin.com/in/nikita-berezyuk-21a87118b" target="_blank" class="fa fa-linkedin">
+                <a href="https://www.linkedin.com/in/nikita-berezyuk-21a87118b" target="_blank" class="home home-linkedin">
                     <ion-icon name="logo-linkedin"></ion-icon>
-                </a>
+                </a><br>
                 <!-- GitHub -->
-                <a href="https://github.com/berezucc" target="_blank" class="fa fa-github">
+                <a href="https://github.com/berezucc" target="_blank" class="home home-github">
                     <ion-icon name="logo-github"></ion-icon>
-                </a>
+                </a><br>
                 <!-- Twitter -->
-                <a href="https://twitter.com/berezucc" target="_blank" class="fa fa-twitter">
+                <a href="https://twitter.com/berezucc" target="_blank" class="home home-twitter">
                     <ion-icon name="logo-twitter"></ion-icon>
                 </a>
             </div>
-        </footer>
-
+            <div class="form-container">
+                <form action="POST" data-netlify="true" class="form-contact">
+                    <h2 id="contact-title-2">Shoot Me A Message!</h2>
+                    
+                    <label for="fname">Name</label>
+                    <input type="text" id="Name" name="Name" placeholder="Your name...">
+                    <label for="femail">Email</label>
+                    <input type="text" id="Email" name="Email" placeholder="Your email...">
+                    <label for="fphone">Phone Number</label>
+                    <input type="phone" id="Phone" name="Phone" placeholder="Your phone number...">
+                    
+                    <label for="fsubject">Subject</label>
+                    <textarea name="Subject" id = "Subject" placeholder="Write something..." rows = "9"></textarea>
+                    
+                    <div class="submit">
+                        <input type="submit" value="Submit" id="submit-button">
+                    </div>
+                
+            </div>
+        </div>
+        <!-- Footer-->
+        <!-- 
+        <footer class="footer-page" id="home-footer">
+        </footer> -->
         <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
         <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     </body>
 </html>
+
+                <!-- 
+                <form id="fcf-form-id" class="fcf-form-class" method="post" action="contact-form-process.php">
+                    <label for="fname">Name</label>
+                    <input type="text" id="Name" name="Name" placeholder="Your name...">
+                    <label for="fname">Email</label>
+                    <input type="text" id="Email" name="Email" placeholder="Your email...">
+                    <label for="fname">Phone Number</label>
+                    <input type="text" id="Phone" name="Phone" placeholder="Your phone number...">
+                    <label for="fname">Subject</label>
+                    <input type="text" id="Subject" name="Subject" placeholder="Write something...">
+
+                    <input type="submit" value="Submit">
+                </form> -->

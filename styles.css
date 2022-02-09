@@ -48,28 +48,31 @@
     display: block;
 }
 
-.title {
-    text-align: center;
-    padding: 50px;
+.title-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 /*Tank video on home page*/
 #myVideo {
-    position: sticky;
     right: 0;
     bottom: 0;
     width: 100%; 
     height: 100%;
+    margin: 0;
+
   }
 
 .home-page {
-    
-}
+  min-height: 500px;
 
-.contact-page {
-    padding: 15em;
 }
-
+.home-page h1{
+  text-align: center;
+  vertical-align: middle;
+}
 
 .footer-page {
     display: grid;
@@ -79,7 +82,7 @@
 }
 /* Styles for icons in footer*/
 .fa {
-    float:right;
+    float: right;
     font-size: 60px;
     text-decoration: none;
     margin-right: 10px;
@@ -248,3 +251,97 @@
   background: #88703bf6;
 }
 
+/* Contact Form*/
+.contact-container{
+  margin: 0px;
+  display:grid;
+  height: 600px;
+  grid-template-columns: 1fr 75%;
+  font-family: 'Lexend Deca', sans-serif;
+}
+.contact-page{
+  grid-column: 1;
+  background-color: #0effaf;
+  float: left;
+  padding: 0px;
+  text-align: center;
+  vertical-align: middle;
+}
+#contact-title{
+  text-align: center;
+  font-family: 'Lexend Deca', sans-serif;
+  color: black;
+  padding-top: 75px;
+}
+#contact-title-2{
+  text-align: center;
+  font-family: 'Lexend Deca', sans-serif;
+  color: rgb(255, 255, 255);
+  padding-top: 15px;
+  font-size: 35px;
+}
+.home {
+  font-size: 60px;
+  text-decoration: none;
+  vertical-align: middle;
+  color: white;
+  padding: 10px;
+}
+.contact-page a{
+  display: inline-block;
+}
+.contact-page a:hover {
+  opacity: 0.7;
+  transform: translateY(-10px);
+  transform: rotate(350deg);
+}
+.home-email{
+  font-size: 60px;
+}
+.form-container{
+  text-align: center;
+  background-color: rgb(158, 158, 158);
+}
+.form-contact{
+  display: grid;
+  grid-template-rows: 4em 1em 3em 1em 3em 1em 3em 1em 9em 4em;  
+  grid-template-columns: 1fr;
+  grid-gap: .8em;
+  padding: 1.2em;
+}
+.form-contact label{
+  color:black;
+}
+.form-contact label:hover{
+  color:white;
+}
+.contact-details{
+  padding:50px;
+}
+#Name, #Email, #Phone{
+  border: 3px solid;
+  border-radius: 5px;
+  border-color:rgb(0, 0, 0);
+  background-color: rgb(255, 255, 255);
+}
+#Subject{
+  border: 3px solid;
+  border-radius: 5px;
+  border-color:rgb(0, 0, 0);
+  background-color: rgb(255, 255, 255);
+}
+#submit-button{
+  background-color: #0effafbd;
+  border: none;
+  color: white;
+  padding: 15px 100px;
+  text-align: center;
+  display: inline-block;
+  font-size: 20px;
+  vertical-align: middle;
+  box-shadow: 3px 3px 3px 3px rgba(1, 109, 34, 0.329);
+}
+#submit-button:hover{
+  cursor: pointer;
+  transform: scale(1.1);
+}
