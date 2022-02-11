@@ -33,6 +33,7 @@
     background-color: #a5894c9d;
     cursor: pointer;
 }
+
 /* Drop Down Menu */
 .dropdown-content li{
     float: none;
@@ -49,25 +50,224 @@
 }
 
 .title-text {
-    position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+
+}
+/* Landing Page */
+
+/* Burger Menu Button*/
+.menu{
+  height: 100%;
+  width: 0;
+  position: fixed;
+  
+  top: 0;
+  left: 0;
+  background: rgb(255,255,255);
+  background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(0,43,52,0.5662640056022409) 100%);
+  overflow-x: hidden; 
+  transition: 0.2s;
+}
+.menu-links{
+  position: relative;
+  top: 25%; /* 25% from the top */
+  width: 100%; /* 100% width */
+  text-align: center; /* Centered text/links */
+  margin-top: 30px;
+}
+#burger{
+  position: relative;
+  top: 15px;
+  left: 45px;
+  margin-bottom:0px;
+  font-size: 90px;
+  font-weight: bolder;
+}
+#burger:hover{
+  cursor:pointer;
+  color:#000000a9;
+}
+.menu .closebtn{
+  position: absolute;
+  top: 25px;
+  right: 55px;
+  font-size: 50px;
+}
+.closebtn:hover{
+  color:rgb(102, 5, 5);
+}
+.socials-landing{
+  position: absolute;
+  bottom:20%;
+  left:10%;
+  right: 10%;
+  font-size:50px;
+}
+.menu .landing{
+  text-decoration: none;
+  display: inline-block;
+  padding:30px;
+  font-size: 60px;
+  color:rgb(37, 37, 37);
+}
+.landing:hover{
+  color:rgb(0, 0, 0);
+  transform: scale(1.5);
+}
+
+/* Drop Down */
+.menu{
+  display:block;
+  text-align: center;
+  z-index: 1000;
+}
+.menu-links li{
+  list-style: none;
+  display: inline-block;
+  position: relative;
+  transition-duration: 0.5s;
+  padding: 5px 30px;  
+  margin: 0 auto;
+  border-left: 2px solid #3ca0e7;
+  text-align: center;
+}
+.menu a{
+  text-decoration: none;
+  color: black;
+  font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  font-size: 25px;
+  font-weight:bolder;
+}
+.menu li a:hover{
+  cursor:pointer;
+  color: rgb(121, 169, 240);
+}
+.menu li:focus-within a {
+  outline: none;
+}
+.menu ul li ul {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  transition: all 0.5s ease;
+  left: 0;
+  display: none;
+}
+.menu ul li:hover > ul,
+.menu ul li:focus-within > ul,
+.menu ul li ul:hover {
+  visibility: visible;
+  opacity: 1;
+  display: block;
+  background-color: rgba(255, 255, 255, 0.075);
+  box-shadow: 0px 3px 5px -1px rgb(61, 61, 61);
+  padding-top:5px;
+  min-width: 200px;
+}
+.menu ul li ul li {
+  clear: both;
+  width: 100%;
+  text-align: left;
+  padding-left: 30px;
+  padding-bottom: 10px;
+  border-left: 0px;
+  float: left;
+}
+.menu ul li ul li:hover{
+  transform:translateX(10px);
 }
 
 /*Tank video on home page*/
-#myVideo {
-    right: 0;
-    bottom: 0;
-    width: 100%; 
-    height: 100%;
-    margin: 0;
+.showcase video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.8;
+  z-index:0;
+}
+header{
+  position: relative;
+  width: 100%;
+  z-index: 1000;
+  background-color: rgba(255, 255, 255, 0.342);
+}
+.text
+{
+  position: relative;
+  z-index: 1000;
+  font-family: 'Lexend Deca', sans-serif;
+  place-items: center;  
+  text-align: center;
+}
 
-  }
-
+/*https://alvarotrigo.com/blog/css-text-animations/*/
+.text .title-word{
+  animation: color-animation 1.5s linear infinite;
+}
+.title-word-1 {
+  --color-1: #53b7df;
+  --color-2: #e39cf5;
+  --color-3: #9242fa;
+}
+.title-word-2 {
+  --color-1: #DBAD4A;
+  --color-2: #7ff7e9;
+  --color-3: #036db4;
+}
+.title-word-3 {
+  --color-1: #ACCFCB;
+  --color-2: #f8716e;
+  --color-3: #fa2617;
+}
+.title-word-4 {
+  --color-1: #59a9cc;
+  --color-2: #fa884b;
+  --color-3: #f56506;
+}
+@keyframes color-animation {
+  0%    {color: var(--color-1)}
+  32%   {color: var(--color-1)}
+  33%   {color: var(--color-2)}
+  65%   {color: var(--color-2)}
+  66%   {color: var(--color-3)}
+  99%   {color: var(--color-3)}
+  100%  {color: var(--color-1)}
+}
+.showcase .welcome{
+  font-size: 100px;
+  text-transform: uppercase;
+  padding-top: 400px;
+  font-weight: 500;
+}
+.logo{
+  float:right;
+  margin-top:30px;
+  margin-right:60px;
+  margin-bottom:0px;
+  font-size: 50px;
+  font-family: 'Lexend Deca', sans-serif;
+  font-weight: bolder;
+  color: #000000;
+}
+.showcase a{
+  position: absolute;
+  font-family: 'Lexend Deca', sans-serif;
+  text-decoration: none;
+  padding: 15px 30px;
+  color: white;
+  background-color: rgba(61, 174, 250, 0.877);
+}
+.showcase a:hover{
+  transform: scale(1.1);
+  background-color: rgba(0, 0, 255, 0.575);
+}
 .home-page {
-  min-height: 500px;
-
+  height:300px;
+  position: fixed;
 }
 .home-page h1{
   text-align: center;
@@ -75,11 +275,18 @@
 }
 
 .footer-page {
-    display: grid;
-    background-color: #b38f419d;
-    padding: 50px 0px;
-    grid-template-columns: 50% auto;
+  display: grid;
+  background-color: #b38f419d;
+  padding: 20px 0px;
+  grid-template-columns: 50% auto;
+  vertical-align: middle;
 }
+.footer-page p{
+  padding-top: 20px;
+  padding-left: 40px;
+  font-size: 30px;
+}
+
 /* Styles for icons in footer*/
 .fa {
     float: right;
@@ -231,7 +438,7 @@
 }
 
 /* Custom Scroll Bar */
-.index-page, .gallery-page, .about-page{
+.test-page, .gallery-page, .about-page, .landing-page{
   overflow:overlay;
 }
 ::-webkit-scrollbar {
@@ -258,6 +465,7 @@
   height: 600px;
   grid-template-columns: 1fr 75%;
   font-family: 'Lexend Deca', sans-serif;
+  background-color: red;
 }
 .contact-page{
   grid-column: 1;
@@ -266,6 +474,7 @@
   padding: 0px;
   text-align: center;
   vertical-align: middle;
+  height: 100%;
 }
 #contact-title{
   text-align: center;

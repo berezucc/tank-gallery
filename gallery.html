@@ -19,26 +19,32 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Exo&family=Nanum+Myeongjo:wght@700&display=swap" rel="stylesheet">
 </head>
-<body class="body-container">
-    <!-- Header -->
-    <header>
-        <!-- Navigation Bar -->
-        <nav class="top-nav">
-            <ul class="nav-links">
-                <li><a href="index.html">HOME</a></li>
-                <li><a href="about.html">ABOUT</a></li>
-                <li class="gallery-conent"><a href="gallery.html">GALLERY</a>
-                    <ul class="dropdown-content">
-                        <li><a href="#Aircraft">Aircraft</a></li>
-                        <li><a href="#cold-war">Cold War</a></li>
-                        <li><a href="#ww2">WW2</a></li>
-                        <li><a href="#ww1">WW1</a></li>
-                    </ul>
-                </li>
-                <li><a href="index.html#contact">CONTACT</a></li>
-            </ul>
-        </nav>
-    </header>
+<body>
+    <section class="showcase">
+        <header>
+            <h1 class="logo">Zucc</h1>
+            <!-- Hamburger button <div class="burger"></div> -->
+            <span onclick="openNav()" id="burger"><ion-icon name="reorder-three-outline"></ion-icon></span>
+        </header>
+    </section>
+    <!-- Menu Bar -->
+    <div class="menu" id="nav">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()"><ion-icon name="close-outline"></ion-icon></a>
+        <ul class="menu-links">
+            <li><a href="index.html" class="hyper"><ion-icon name="home-outline"></ion-icon> HOME</a></li>
+            <li><a href="about.html" class="hyper"><ion-icon name="person-outline"></ion-icon> ABOUT</a></li>
+            <li class="gallery-menu" ><a href="gallery.html" class="hyper"><ion-icon name="images-outline"></ion-icon> GALLERY</a>
+                <ul class="dropdown-links">
+                    <li><a href="gallery.html#ww1">WW1</a></li>
+                    <li><a href="gallery.html#ww2">WW2</a></li>
+                    <li><a href="gallery.html#cold-war">Cold War</a></li>
+                    <li><a href="gallery.html#Aircraft">Aircraft</a></li>     
+                </ul>
+            </li>
+            <li><a href="about.html#contact" class="hyper"><ion-icon name="send-outline"></ion-icon> CONTACT</a></li>
+        </ul>
+    </div>
+
     <!-- Introduction -->
     <div class="gallery-parallax">
     </div>
@@ -533,8 +539,7 @@
     <!-- Footer -->
     <footer class="footer-page">
         <div>
-            <p>Footer</p>
-
+            <p>Nikita Berezyuk </p>
         </div>
         <div class="socials"> 
             <!-- Instagram -->
@@ -556,6 +561,7 @@
         </div>
     </footer>
 
+    <script src="icon-change.js"></script>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 </body>

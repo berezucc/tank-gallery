@@ -1,106 +1,71 @@
-<!-- Main Page -->
 <!DOCTYPE html>
-<html class="index-page">
-    <head>
-        <title>Nikita's Armour Gallery</title>
-        <meta name="Description" content="Tank Photo Gallery by Nikita Berezyk">
-        <link rel="stylesheet" href="styles.css">
-        <link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@200&display=swap" rel="stylesheet">
-        <!-- https://css-tricks.com/animate-a-container-on-mouse-over-using-perspective-and-transform/ -->
-    </head>
-    <body>
-        <!-- Header -->
+<html lang="en" class="landing-page">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nikita's Armour Gallery</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Exo&family=Nanum+Myeongjo:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <section class="showcase">
         <header>
-            <!-- Navigation Bar -->
-            <nav class="top-nav">
-                <ul class="nav-links">
-                    <li><a href="#home">HOME</a></li>
-                    <li><a href="about.html">ABOUT</a></li>
-                    <li class="gallery-conent"><a href="gallery.html">GALLERY</a>
-                        <ul class="dropdown-content">
-                            <li><a href="gallery.html#Aircraft">Aircraft</a></li>
-                            <li><a href="gallery.html#cold-war">Cold War</a></li>
-                            <li><a href="gallery.html#ww2">WW2</a></li>
-                            <li><a href="gallery.html#ww1">WW1</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="#contact">CONTACT</a></li>
-                </ul>
-            </nav>
+            <h1 class="logo">Zucc</h1>
+            <!-- Hamburger button <div class="burger"></div> -->
+            <span onclick="openNav()" id="burger"><ion-icon name="reorder-three-outline"></ion-icon></span>
         </header>
-        <!-- Body -->
-        <div class="home-page" id="home"> 
-            <h1 class="title-text">My Heading</h1>
-            <!-- Tank -->
-            <video autoplay muted loop id="myVideo">
-                <source src="Tanks/T-72.mp4" type="video/mp4">
-            </video>
-            
+        <video autoplay muted loop id="myVideo">
+            <source src="Tanks/T-72.mp4" type="video/mp4">
+        </video> 
+        <div class="text">
         </div>
-        <!-- Contact Page -->
-        <div class ="contact-container">
-            <div class="contact-page" id="contact">
-                <h1 id="contact-title">Get In Touch</h1><br>
-                <!-- Email -->
-                <a href="mailto:nikita@cntechmodel.biz" target="_blank" class="home home-email">
-                    <ion-icon name="mail-outline"></ion-icon>
-                </a><br>
-                <!-- Instagram -->
-                <a href="https://www.instagram.com/nikita.berezyuk/" target="_blank" class="home home-instagram">
-                    <ion-icon name="logo-instagram"></ion-icon>
-                </a><br>
-                <!-- LinkedIn -->
-                <a href="https://www.linkedin.com/in/nikita-berezyuk-21a87118b" target="_blank" class="home home-linkedin">
-                    <ion-icon name="logo-linkedin"></ion-icon>
-                </a><br>
-                <!-- GitHub -->
-                <a href="https://github.com/berezucc" target="_blank" class="home home-github">
-                    <ion-icon name="logo-github"></ion-icon>
-                </a><br>
-                <!-- Twitter -->
-                <a href="https://twitter.com/berezucc" target="_blank" class="home home-twitter">
-                    <ion-icon name="logo-twitter"></ion-icon>
-                </a>
-            </div>
-            <div class="form-container">
-                <form action="POST" data-netlify="true" class="form-contact">
-                    <h2 id="contact-title-2">Shoot Me A Message!</h2>
-                    
-                    <label for="fname">Name</label>
-                    <input type="text" id="Name" name="Name" placeholder="Your name...">
-                    <label for="femail">Email</label>
-                    <input type="text" id="Email" name="Email" placeholder="Your email...">
-                    <label for="fphone">Phone Number</label>
-                    <input type="phone" id="Phone" name="Phone" placeholder="Your phone number...">
-                    
-                    <label for="fsubject">Subject</label>
-                    <textarea name="Subject" id = "Subject" placeholder="Write something..." rows = "9"></textarea>
-                    
-                    <div class="submit">
-                        <input type="submit" value="Submit" id="submit-button">
-                    </div>
-                
-            </div>
+    </section>
+
+    <!-- Menu Bar -->
+    <div class="menu" id="nav">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()"><ion-icon name="close-outline"></ion-icon></a>
+        <ul class="menu-links">
+            <li><a href="index.html" class="hyper"><ion-icon name="home-outline"></ion-icon> HOME</a></li>
+            <li><a href="about.html" class="hyper"><ion-icon name="person-outline"></ion-icon> ABOUT</a></li>
+            <li class="gallery-menu" ><a href="gallery.html" class="hyper"><ion-icon name="images-outline"></ion-icon> GALLERY</a>
+                <ul class="dropdown-links">
+                    <li><a href="gallery.html#ww1">WW1</a></li>
+                    <li><a href="gallery.html#ww2">WW2</a></li>
+                    <li><a href="gallery.html#cold-war">Cold War</a></li>
+                    <li><a href="gallery.html#Aircraft">Aircraft</a></li>     
+                </ul>
+            </li>
+            <li><a href="about.html#contact" class="hyper"><ion-icon name="send-outline"></ion-icon> CONTACT</a></li>
+        </ul>
+        <div class="socials-landing">
+            <a href="mailto:nikita@cntechmodel.biz" target="_blank" class="landing landing-email">
+                <ion-icon name="mail-outline"></ion-icon>
+            </a>
+            <!-- Instagram -->
+            <a href="https://www.instagram.com/nikita.berezyuk/" target="_blank" class="landing landing-instagram">
+                <ion-icon name="logo-instagram"></ion-icon>
+            </a>
+            <!-- LinkedIn -->
+            <a href="https://www.linkedin.com/in/nikita-berezyuk-21a87118b" target="_blank" class="landing landing-linkedin">
+                <ion-icon name="logo-linkedin"></ion-icon>
+            </a>
+            <!-- GitHub -->
+            <a href="https://github.com/berezucc" target="_blank" class="landing landing-github">
+                <ion-icon name="logo-github"></ion-icon>
+            </a>
+            <!-- Twitter -->
+            <a href="https://twitter.com/berezucc" target="_blank" class="landing landing-twitter">
+                <ion-icon name="logo-twitter"></ion-icon>
+            </a>
         </div>
-        <!-- Footer-->
-        <!-- 
-        <footer class="footer-page" id="home-footer">
-        </footer> -->
-        <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
-        <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
-    </body>
+    </div>
+
+    <script src="icon-change.js"></script>
+
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+</body>
 </html>
-
-                <!-- 
-                <form id="fcf-form-id" class="fcf-form-class" method="post" action="contact-form-process.php">
-                    <label for="fname">Name</label>
-                    <input type="text" id="Name" name="Name" placeholder="Your name...">
-                    <label for="fname">Email</label>
-                    <input type="text" id="Email" name="Email" placeholder="Your email...">
-                    <label for="fname">Phone Number</label>
-                    <input type="text" id="Phone" name="Phone" placeholder="Your phone number...">
-                    <label for="fname">Subject</label>
-                    <input type="text" id="Subject" name="Subject" placeholder="Write something...">
-
-                    <input type="submit" value="Submit">
-                </form> -->
