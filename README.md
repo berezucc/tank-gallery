@@ -9,6 +9,7 @@ Hosted with GitHub, does not allow for a form functionality and custom domain na
 
 ## Description
 I wanted to learn the fundamentals of front-end web development so I created a personal image gallery. It is just a small and simple website built with HTML, CSS, and a bit of Javascript.  
+
 **Main features I spent time working on:**
   - a functional menu navigation bar
   - responsive display for desktop / mobile devices
