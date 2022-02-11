@@ -16,3 +16,4 @@ I wanted to learn the fundamentals of front-end web development so I created a p
   - responsive gallery (display: grid)
   - image gallery functionality when clicking on an image (lightbox)
   - form functionality for the contact page
+  - colour changing text
