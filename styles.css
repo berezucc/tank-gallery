@@ -188,6 +188,8 @@
   object-fit: cover;
   opacity: 0.8;
   z-index:0;
+  -o-filter: blur(3px);
+  filter: blur(7px);
 }
 header{
   position: relative;
@@ -205,8 +207,21 @@ header{
 }
 
 /*https://alvarotrigo.com/blog/css-text-animations/*/
+.text{
+  position:absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 50px;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.527);
+  border: 3px solid #000000be;
+  border-radius: 5px;
+}
 .text .title-word{
   animation: color-animation 1.5s linear infinite;
+  font-size: 50px;
+  font-family: 'Lexend Deca', sans-serif;
 }
 .title-word-1 {
   --color-1: #53b7df;
@@ -242,6 +257,9 @@ header{
   text-transform: uppercase;
   padding-top: 400px;
   font-weight: 500;
+}
+.showcase {
+  background-color: #b38f419d;
 }
 .logo{
   float:right;
@@ -465,7 +483,7 @@ header{
   height: 600px;
   grid-template-columns: 1fr 75%;
   font-family: 'Lexend Deca', sans-serif;
-  background-color: red;
+  background-color: rgb(255, 255, 255);
 }
 .contact-page{
   grid-column: 1;
@@ -485,8 +503,9 @@ header{
 #contact-title-2{
   text-align: center;
   font-family: 'Lexend Deca', sans-serif;
-  color: rgb(255, 255, 255);
-  padding-top: 15px;
+  color: rgb(136, 136, 136);
+  padding-top: 5px;
+  padding-bottom: 5px;
   font-size: 35px;
 }
 .home {
@@ -509,7 +528,7 @@ header{
 }
 .form-container{
   text-align: center;
-  background-color: rgb(158, 158, 158);
+  background-color: rgba(255, 255, 255, 0.897);
 }
 .form-contact{
   display: grid;
@@ -519,26 +538,24 @@ header{
   padding: 1.2em;
 }
 .form-contact label{
-  color:black;
+  color:rgb(0, 0, 0);
+  font-weight: bolder;
 }
 .form-contact label:hover{
-  color:white;
+  color:rgb(78, 78, 78);
 }
 .contact-details{
   padding:50px;
 }
-#Name, #Email, #Phone{
-  border: 3px solid;
-  border-radius: 5px;
-  border-color:rgb(0, 0, 0);
-  background-color: rgb(255, 255, 255);
+#Name-label{
+  padding-top: 10px;
 }
-#Subject{
-  border: 3px solid;
-  border-radius: 5px;
-  border-color:rgb(0, 0, 0);
-  background-color: rgb(255, 255, 255);
+#Name, #Email, #Phone, #Subject{
+  border: 0px;
+  outline: 0px;
+  border-bottom:2px solid #9e9e9e
 }
+
 #submit-button{
   background-color: #0effafbd;
   border: none;
@@ -553,4 +570,72 @@ header{
 #submit-button:hover{
   cursor: pointer;
   transform: scale(1.1);
+}
+
+/* About Page */
+#about-title{
+  text-align: center;
+  font-size: 50px;
+  font-weight: bold;
+  font-family: 'Lexend Deca', sans-serif;
+  background-color: rgb(248, 246, 246);
+  padding-bottom: 20px;
+  padding-top: 20px;
+
+}
+.about-container{
+  display: grid;  
+  grid-gap: 5px;  
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-template-rows: repeat(1, 550px);  
+  font-family: 'Lexend Deca', sans-serif;
+  text-align: center;
+  background-color: rgb(255, 255, 255);
+}
+.about-text {
+  position: relative;
+  line-height: 500px;
+}
+.about-text h3{
+  line-height: 1.5;
+  display: inline-block;
+  vertical-align: middle;
+}
+.flex-child{
+  height: 500px;
+  padding: 25px;
+}
+.about-video{
+  position: relative;
+  background-color:#0effaf;
+}
+.play-button{
+  position:absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  border-radius: 50%;
+  font-size: 30px;
+  font-weight: bolder;
+  padding: 10px 18px;
+  color: rgb(71, 71, 71);
+  background-color: rgba(153, 153, 153, 0.664);
+  text-align: center;
+  border: none;
+  z-index: 2;
+}
+.about-video .play-button:hover{
+  cursor: pointer;
+  background-color: rgba(219, 219, 219, 0.733);
+}
+.about-container video{
+  height: 500px;
+  margin-top: 0px;
+  margin-right: auto;
+  margin-bottom: 0px;
+  margin-left: auto;
+  width: 80%;
+  border:none;
+  padding: none;
 }

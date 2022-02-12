@@ -33,11 +33,24 @@
             <li><a href="about.html#contact" class="hyper"><ion-icon name="send-outline"></ion-icon> CONTACT</a></li>
         </ul>
     </div>
+    <!-- About Page -->
+    <h2 id = "about-title">About</h2>
+    <div class="about-container">
+        <div class="flex-child about-text">
+            <h3>From a young age, I have found great interest in military equipment and history. This obsession of mine was started in the third grade when I began playing an online free-to-play video game, World of Tanks. Since then, I have continued to learn more about military vehicles and the history of war. Fascinated with military vehicles, I spent a lot of time researching and finding military museums and vehicle installments. Some places I have visited include CFB Borden, Oshawa Regiment Museum, Georgina Military Museum, Canadian War Museum, Woodbrige Memorial Tower, North York Cemetery, etc. The Oshawa Regiment Museum has been my most memorable experience since I got to drive around in a real M113 APC. I am looking forward to returning to this museum since they have increased their inventory of rare vehicles. This website is meant to serve as a gallery of my adventures across Ontario, finding military equipment and vehicles. Hopefully, I will be able to travel to other provinces and countries to visit many of their tanks and aircraft in the future. </h3>
+        </div>
+        <div class="flex-child about-video">
+            <button class="play-button" id="pb" onclick="play_pause()">▶</button>
+            <video muted id="clip">
+                <source src="Images/tankClip.mp4" type="video/mp4">
+            </video>
+        </div>
+    </div>
 
     <!-- Contact Page -->
     <div class ="contact-container">
         <div class="contact-page" id="contact">
-            <h1 id="contact-title">Get In Touch</h1><br>
+            <h1 id="contact-title">Get In Touch ~</h1><br>
             <!-- Email -->
             <a href="mailto:nikita@cntechmodel.biz" target="_blank" class="home home-email">
                 <ion-icon name="mail-outline"></ion-icon>
@@ -63,12 +76,12 @@
             <form action="POST" data-netlify="true" class="form-contact">
                 <h2 id="contact-title-2">Shoot Me A Message!</h2>
                 
-                <label for="fname">Name</label>
-                <input type="text" id="Name" name="Name" placeholder="Your name...">
+                <label for="fname" id="Name-label">Name</label>
+                <input type="text" id="Name" name="Name" placeholder="Name...">
                 <label for="femail">Email</label>
-                <input type="text" id="Email" name="Email" placeholder="Your email...">
+                <input type="text" id="Email" name="Email" placeholder="Email...">
                 <label for="fphone">Phone Number</label>
-                <input type="phone" id="Phone" name="Phone" placeholder="Your phone number...">
+                <input type="phone" id="Phone" name="Phone" placeholder="Phone...">
                 
                 <label for="fsubject">Subject</label>
                 <textarea name="Subject" id = "Subject" placeholder="Write something..." rows = "9"></textarea>
@@ -80,6 +93,7 @@
         </div>
     </div>
 
+    <script src="play-button.js"></script>
     <script src="icon-change.js"></script>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
