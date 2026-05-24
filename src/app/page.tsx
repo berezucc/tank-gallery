@@ -1,65 +1,69 @@
-import Image from "next/image";
+import { Suspense } from 'react';
+import Link from 'next/link';
+import { getGalleryVehicles } from '@/lib/supabase/queries';
+import { FilterBar } from '@/components/gallery/FilterBar';
+import { GalleryGrid } from '@/components/gallery/GalleryGrid';
+import { Lightbox } from '@/components/gallery/Lightbox';
+import { VEHICLE_TYPES, VEHICLE_ERAS } from '@/lib/constants';
+import type { GalleryFilters, VehicleType, VehicleEra } from '@/types';
 
-export default function Home() {
+type SearchParams = Promise<Record<string, string | string[] | undefined>>;
+
+function parseFilters(raw: Record<string, string | undefined>): GalleryFilters {
+  const filters: GalleryFilters = {};
+  if (raw.era    && (VEHICLE_ERAS  as readonly string[]).includes(raw.era))   filters.era    = raw.era as VehicleEra;
+  if (raw.type   && (VEHICLE_TYPES as readonly string[]).includes(raw.type))  filters.type   = raw.type as VehicleType;
+  if (raw.nation) filters.nation = raw.nation;
+  if (raw.q)      filters.q      = raw.q.trim();
+  return filters;
+}
+
+export default async function Home({ searchParams }: { searchParams: SearchParams }) {
+  const raw = await searchParams;
+  // Coerce string | string[] | undefined → string | undefined (we only use the first value).
+  const flat: Record<string, string | undefined> = {};
+  for (const [k, v] of Object.entries(raw)) {
+    flat[k] = Array.isArray(v) ? v[0] : v;
+  }
+
+  const filters  = parseFilters(flat);
+  const vehicles = await getGalleryVehicles(filters);
+
+  // Distinct nations from the unfiltered set would require a second query — for now
+  // derive them from the current result set, plus any active nation filter so the
+  // pill stays visible even when it's the only match.
+  const nationSet = new Set<string>();
+  vehicles.forEach((v) => v.nation && nationSet.add(v.nation));
+  if (flat.nation) nationSet.add(flat.nation);
+  const availableNations = Array.from(nationSet).sort();
+
+  const openVehicle = flat.photo
+    ? vehicles.find((v) => v.id === flat.photo) ?? null
+    : null;
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <main className="mx-auto max-w-screen-2xl px-6 pb-12 pt-6">
+      <header className="mb-6 flex items-baseline justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Tank Gallery</h1>
+          <p className="mt-1 text-sm text-zinc-500">
+            {vehicles.length} {vehicles.length === 1 ? 'vehicle' : 'vehicles'}
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+        <nav className="flex gap-4 text-sm text-zinc-400">
+          <Link href="/map"      className="hover:text-zinc-100">Map</Link>
+          <Link href="/stats"    className="hover:text-zinc-100">Stats</Link>
+          <Link href="/identify" className="hover:text-zinc-100">Identify</Link>
+        </nav>
+      </header>
+
+      <Suspense fallback={null}>
+        <FilterBar availableNations={availableNations} />
+      </Suspense>
+
+      <GalleryGrid vehicles={vehicles} searchParams={flat} />
+
+      <Lightbox vehicle={openVehicle} />
+    </main>
   );
 }

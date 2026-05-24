@@ -1,36 +1,101 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Tank Gallery 2.0
 
-## Getting Started
+Modern rebuild of [tank-gallery.netlify.app](https://tank-gallery.netlify.app/) — a dark, minimal gallery for personal photos of tanks, aircraft, artillery, and military vehicles, with AI-powered classification on upload.
 
-First, run the development server:
+## Stack
+
+- **Next.js 16** (App Router) + **React 19** + **TypeScript**
+- **Tailwind CSS v4** (CSS-first config)
+- **Supabase** — Postgres + Auth + Storage
+- **Google Gemini 2.5 Flash** — vehicle classification (Phase 4)
+- **Framer Motion** — animations (Phase 2)
+- **Vercel** — hosting
+
+## Local setup
 
 ```bash
+git clone <repo>
+cd tank-gallery-v2
+npm install
+cp .env.example .env.local
+# fill in the Supabase + Gemini values, then:
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open <http://localhost:3000>.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Supabase setup
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Create a project at <https://supabase.com/dashboard>.
+2. **Project Settings → API**: copy `Project URL`, `anon` key, and `service_role` key into `.env.local`.
+3. **Storage → New bucket**: name it `photos`, set it to **public**.
+4. **SQL Editor**: run the migrations in `supabase/migrations/` in order:
+   - `001_create_vehicles.sql`
+   - `002_create_photos.sql`
+   - `003_rls_policies.sql`
+   - `004_storage_bucket.sql`
+5. **Authentication → Users → Add user**: create your admin account (email/password).
 
-## Learn More
+### Optional: run migrations via the CLI
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm install -g supabase
+supabase login   # uses SUPABASE_ACCESS_TOKEN from your env
+supabase link --project-ref <your-project-ref>
+supabase db push
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Gemini setup
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Get a key at <https://aistudio.google.com/app/apikey>.
+2. Paste it into `GEMINI_API_KEY` in `.env.local`.
 
-## Deploy on Vercel
+Free tier covers the one-time bulk classification of the existing collection (~250 requests/day cap; 200–500 photos finishes in 1–2 days).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Project structure
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+src/
+├── app/                  # App Router pages + layouts
+│   ├── layout.tsx        # Root layout (dark theme, fonts)
+│   ├── page.tsx          # Public gallery (Phase 2)
+│   ├── admin/            # Auth-gated admin panel (Phase 3)
+│   └── api/              # Route handlers (uploads, classify)
+├── components/
+│   ├── gallery/          # GalleryGrid, Lightbox, FilterBar, etc.
+│   ├── admin/            # UploadZone, ClassifyReview, etc.
+│   └── ui/               # Shared primitives
+├── lib/
+│   ├── supabase/         # Browser, server, service-role clients
+│   ├── constants.ts      # Enums + filter options
+│   ├── gemini.ts         # Gemini API wrapper (Phase 4)
+│   └── images.ts         # Sharp processing (Phase 3)
+├── hooks/
+└── types/
+
+supabase/
+└── migrations/           # SQL applied in numeric order
+```
+
+## Scripts
+
+| Command | What it does |
+|---|---|
+| `npm run dev` | Local dev server (turbopack) on :3000 |
+| `npm run build` | Production build |
+| `npm run start` | Serve the production build |
+| `npm run lint` | ESLint |
+
+## Build phases
+
+- **Phase 1** ✅ — scaffold (this commit)
+- **Phase 2** — public gallery (grid, filters, lightbox)
+- **Phase 3** — admin panel (auth, uploads, management)
+- **Phase 4** — Gemini classification pipeline
+- **Phase 5** — v1 migration + polish
+
+## Security notes
+
+- `NEXT_PUBLIC_*` vars are exposed to the browser. Only the anon key + project URL should be prefixed this way.
+- `SUPABASE_SERVICE_ROLE_KEY` bypasses RLS — only import from `src/lib/supabase/admin.ts`, only used in server-side code.
+- `SUPABASE_ACCESS_TOKEN` (PAT) is for the CLI only — not read at runtime.

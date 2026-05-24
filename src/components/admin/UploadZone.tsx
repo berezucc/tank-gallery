@@ -1,0 +1,530 @@
+'use client';
+
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useDropzone } from 'react-dropzone';
+import {
+  VEHICLE_TYPES,
+  VEHICLE_ERAS,
+  VEHICLE_TYPE_LABELS,
+  VEHICLE_ERA_LABELS,
+} from '@/lib/constants';
+import type { VehicleEra, VehicleType } from '@/types';
+
+type Status = 'uploading' | 'ready' | 'saving' | 'saved' | 'error';
+
+interface AiSuggestion {
+  name: string;
+  type: VehicleType;
+  era: VehicleEra;
+  nation: string;
+  confidence: 'high' | 'medium' | 'low';
+}
+
+interface ExistingVehicle {
+  id: string;
+  name: string;
+  type: VehicleType;
+  era: VehicleEra;
+  nation: string | null;
+}
+
+interface PendingItem {
+  id: string;
+  file: File;
+  previewUrl: string;
+  status: Status;
+  errorMsg?: string;
+  classifying: boolean;
+  ai?: AiSuggestion;
+  upload?: {
+    storage_path: string;
+    thumbnail_path: string;
+    blurhash: string;
+    width: number;
+    height: number;
+  };
+  // Form state:
+  name: string;
+  type: VehicleType;
+  era: VehicleEra;
+  nation: string;
+  location: string;
+  date: string;
+  metadataTouched: boolean;
+  // Set when user picks an existing vehicle from the autocomplete; in that case
+  // save sends { vehicle_id } instead of { vehicle: {...} }.
+  existing?: ExistingVehicle;
+}
+
+export function UploadZone() {
+  const router = useRouter();
+  const [items, setItems] = useState<PendingItem[]>([]);
+
+  const onDrop = useCallback(async (accepted: File[]) => {
+    const newItems: PendingItem[] = accepted.map((file) => ({
+      id: crypto.randomUUID(),
+      file,
+      previewUrl: URL.createObjectURL(file),
+      status: 'uploading',
+      classifying: true,
+      name: '',
+      type: 'tank',
+      era: 'ww2',
+      nation: '',
+      location: '',
+      date: '',
+      metadataTouched: false,
+    }));
+    setItems((prev) => [...prev, ...newItems]);
+
+    await Promise.all(newItems.map((item) => Promise.all([
+      uploadOne(item, setItems),
+      classifyOne(item, setItems),
+    ])));
+  }, []);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: { 'image/*': [] },
+    multiple: true,
+  });
+
+  function updateItem(id: string, patch: Partial<PendingItem>) {
+    setItems((prev) => prev.map((it) => (it.id === id ? { ...it, ...patch } : it)));
+  }
+
+  function touchMetadata(id: string, patch: Partial<PendingItem>) {
+    setItems((prev) => prev.map((it) =>
+      it.id === id ? { ...it, ...patch, metadataTouched: true } : it
+    ));
+  }
+
+  async function save(item: PendingItem) {
+    if (!item.upload) return;
+    if (!item.existing && !item.name.trim()) {
+      updateItem(item.id, { errorMsg: 'Vehicle name is required.' });
+      return;
+    }
+    updateItem(item.id, { status: 'saving', errorMsg: undefined });
+
+    const payload: Record<string, unknown> = {
+      photo: {
+        storage_path:   item.upload.storage_path,
+        thumbnail_path: item.upload.thumbnail_path,
+        blurhash:       item.upload.blurhash,
+        width:          item.upload.width,
+        height:         item.upload.height,
+        location_taken: item.location.trim() || null,
+        date_taken:     item.date || null,
+      },
+    };
+    if (item.existing) {
+      payload.vehicle_id = item.existing.id;
+    } else {
+      payload.vehicle = {
+        name:   item.name.trim(),
+        type:   item.type,
+        era:    item.era,
+        nation: item.nation.trim() || null,
+      };
+    }
+
+    const res = await fetch('/api/photos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      updateItem(item.id, { status: 'error', errorMsg: body.error ?? res.statusText });
+      return;
+    }
+    updateItem(item.id, { status: 'saved' });
+  }
+
+  function removeItem(id: string) {
+    setItems((prev) => prev.filter((it) => it.id !== id));
+  }
+
+  const hasUnsaved = items.some((i) => i.status === 'ready' || i.status === 'error');
+
+  return (
+    <div>
+      <div
+        {...getRootProps()}
+        className={
+          'cursor-pointer rounded-md border-2 border-dashed px-6 py-12 text-center transition-colors ' +
+          (isDragActive
+            ? 'border-zinc-400 bg-zinc-900'
+            : 'border-zinc-800 hover:border-zinc-700')
+        }
+      >
+        <input {...getInputProps()} />
+        <p className="text-sm text-zinc-400">
+          {isDragActive ? 'Drop them here…' : 'Drag photos here, or click to select.'}
+        </p>
+        <p className="mt-1 text-xs text-zinc-600">JPG, PNG, WebP — Gemini auto-fills metadata.</p>
+      </div>
+
+      {items.length > 0 && (
+        <div className="mt-6 space-y-4">
+          {items.map((item) => (
+            <ItemCard
+              key={item.id}
+              item={item}
+              onChange={(patch) => touchMetadata(item.id, patch)}
+              onAttachExisting={(v) => updateItem(item.id, {
+                existing: v,
+                name: v.name,
+                type: v.type,
+                era: v.era,
+                nation: v.nation ?? '',
+                metadataTouched: true,
+                errorMsg: undefined,
+              })}
+              onDetachExisting={() => updateItem(item.id, { existing: undefined })}
+              onSave={() => save(item)}
+              onRemove={() => removeItem(item.id)}
+            />
+          ))}
+
+          {items.every((i) => i.status === 'saved') && (
+            <button
+              onClick={() => router.push('/admin')}
+              className="w-full rounded-md bg-zinc-100 px-3 py-2 text-sm font-medium text-zinc-900 hover:bg-white"
+            >
+              Done — back to dashboard
+            </button>
+          )}
+          {hasUnsaved && (
+            <p className="text-xs text-zinc-600">
+              Review the AI suggestions, edit as needed, and hit Save. Unsaved items will be lost on refresh.
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+async function uploadOne(
+  item: PendingItem,
+  setItems: React.Dispatch<React.SetStateAction<PendingItem[]>>
+) {
+  const form = new FormData();
+  form.append('file', item.file);
+  try {
+    const res = await fetch('/api/upload', { method: 'POST', body: form });
+    const body = await res.json();
+    if (!res.ok) throw new Error(body.error ?? res.statusText);
+    setItems((prev) => prev.map((it) => (it.id === item.id
+      ? { ...it, status: 'ready', upload: body }
+      : it)));
+  } catch (e) {
+    setItems((prev) => prev.map((it) => (it.id === item.id
+      ? { ...it, status: 'error', errorMsg: e instanceof Error ? e.message : 'Upload failed' }
+      : it)));
+  }
+}
+
+async function classifyOne(
+  item: PendingItem,
+  setItems: React.Dispatch<React.SetStateAction<PendingItem[]>>
+) {
+  const form = new FormData();
+  form.append('file', item.file);
+  try {
+    const res = await fetch('/api/classify', { method: 'POST', body: form });
+    if (!res.ok) throw new Error('classify failed');
+    const ai = (await res.json()) as AiSuggestion;
+
+    setItems((prev) => prev.map((it) => {
+      if (it.id !== item.id) return it;
+      if (it.metadataTouched || it.existing) {
+        return { ...it, ai, classifying: false };
+      }
+      return {
+        ...it,
+        ai,
+        classifying: false,
+        name:   ai.name,
+        type:   ai.type,
+        era:    ai.era,
+        nation: ai.nation,
+      };
+    }));
+  } catch {
+    setItems((prev) => prev.map((it) =>
+      it.id === item.id ? { ...it, classifying: false } : it
+    ));
+  }
+}
+
+interface CardProps {
+  item: PendingItem;
+  onChange: (patch: Partial<PendingItem>) => void;
+  onAttachExisting: (v: ExistingVehicle) => void;
+  onDetachExisting: () => void;
+  onSave: () => void;
+  onRemove: () => void;
+}
+
+function ItemCard({ item, onChange, onAttachExisting, onDetachExisting, onSave, onRemove }: CardProps) {
+  return (
+    <div className="flex gap-4 rounded-md border border-zinc-800 bg-zinc-950 p-4">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={item.previewUrl}
+        alt={item.file.name}
+        className="h-32 w-32 flex-shrink-0 rounded object-cover"
+      />
+      <div className="flex flex-1 flex-col gap-2">
+        <div className="flex items-center justify-between gap-2">
+          <span className="truncate text-xs text-zinc-500">{item.file.name}</span>
+          <div className="flex items-center gap-2">
+            {item.classifying && (
+              <span className="text-[10px] uppercase tracking-wider text-zinc-500">ai thinking…</span>
+            )}
+            {item.ai && (
+              <span className="text-[10px] uppercase tracking-wider text-zinc-500">ai: {item.ai.confidence}</span>
+            )}
+            <StatusPill status={item.status} />
+          </div>
+        </div>
+
+        {item.status === 'uploading' && (
+          <p className="text-xs text-zinc-500">Processing image…</p>
+        )}
+
+        {(item.status === 'ready' || item.status === 'saving' || item.status === 'error') && (
+          <>
+            {item.existing && (
+              <div className="flex items-center justify-between rounded-md border border-emerald-900 bg-emerald-950/40 px-3 py-2 text-xs">
+                <span className="text-emerald-300">
+                  Attaching to existing: <strong className="text-emerald-100">{item.existing.name}</strong>
+                </span>
+                <button
+                  onClick={onDetachExisting}
+                  className="text-emerald-400 underline-offset-4 hover:text-emerald-200 hover:underline"
+                >
+                  × change
+                </button>
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 gap-2">
+              <NameAutocomplete
+                value={item.name}
+                onChange={(v) => onChange({ name: v })}
+                onPick={onAttachExisting}
+                disabled={Boolean(item.existing)}
+              />
+              <Input
+                placeholder="Nation (e.g. USA)"
+                value={item.nation}
+                onChange={(v) => onChange({ nation: v })}
+                disabled={Boolean(item.existing)}
+              />
+              <Select
+                value={item.type}
+                onChange={(v) => onChange({ type: v as VehicleType })}
+                options={VEHICLE_TYPES.map((t) => ({ value: t, label: VEHICLE_TYPE_LABELS[t] }))}
+                disabled={Boolean(item.existing)}
+              />
+              <Select
+                value={item.era}
+                onChange={(v) => onChange({ era: v as VehicleEra })}
+                options={VEHICLE_ERAS.map((e) => ({ value: e, label: VEHICLE_ERA_LABELS[e] }))}
+                disabled={Boolean(item.existing)}
+              />
+              <Input
+                placeholder="Location (museum, site)"
+                value={item.location}
+                onChange={(v) => onChange({ location: v })}
+              />
+              <Input
+                type="date"
+                value={item.date}
+                onChange={(v) => onChange({ date: v })}
+              />
+            </div>
+
+            {item.ai && (
+              <p className="text-[11px] text-zinc-500">
+                Gemini suggested: <span className="text-zinc-300">{item.ai.name}</span>
+                {' · '}{VEHICLE_TYPE_LABELS[item.ai.type]}
+                {' · '}{VEHICLE_ERA_LABELS[item.ai.era]}
+                {item.ai.nation ? ` · ${item.ai.nation}` : ''}
+              </p>
+            )}
+
+            {item.errorMsg && (
+              <p className="text-xs text-red-400">{item.errorMsg}</p>
+            )}
+
+            <div className="mt-1 flex gap-2">
+              <button
+                onClick={onSave}
+                disabled={item.status === 'saving'}
+                className="rounded-md bg-zinc-100 px-3 py-1.5 text-xs font-medium text-zinc-900 hover:bg-white disabled:opacity-50"
+              >
+                {item.status === 'saving' ? 'Saving…' : 'Save'}
+              </button>
+              <button
+                onClick={onRemove}
+                className="rounded-md border border-zinc-800 px-3 py-1.5 text-xs text-zinc-400 hover:bg-zinc-900"
+              >
+                Remove
+              </button>
+            </div>
+          </>
+        )}
+
+        {item.status === 'saved' && (
+          <p className="text-xs text-emerald-400">Saved.</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+interface AutocompleteProps {
+  value: string;
+  onChange: (v: string) => void;
+  onPick: (v: ExistingVehicle) => void;
+  disabled?: boolean;
+}
+
+function NameAutocomplete({ value, onChange, onPick, disabled }: AutocompleteProps) {
+  const [suggestions, setSuggestions] = useState<ExistingVehicle[]>([]);
+  const [open, setOpen] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    function onDocClick(e: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', onDocClick);
+    return () => document.removeEventListener('mousedown', onDocClick);
+  }, []);
+
+  function fetchSuggestions(q: string) {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (q.trim().length < 2) {
+      setSuggestions([]);
+      return;
+    }
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/vehicles?q=${encodeURIComponent(q.trim())}`);
+        if (!res.ok) return;
+        const data = (await res.json()) as ExistingVehicle[];
+        setSuggestions(data);
+        setOpen(data.length > 0);
+      } catch {
+        // silent
+      }
+    }, 250);
+  }
+
+  return (
+    <div ref={containerRef} className="relative">
+      <input
+        type="text"
+        placeholder="Vehicle name *"
+        value={value}
+        disabled={disabled}
+        onChange={(e) => {
+          onChange(e.target.value);
+          fetchSuggestions(e.target.value);
+        }}
+        onFocus={() => {
+          if (suggestions.length > 0) setOpen(true);
+        }}
+        className="w-full rounded border border-zinc-800 bg-zinc-900 px-2 py-1.5 text-xs text-zinc-100 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none disabled:opacity-50"
+      />
+      {open && suggestions.length > 0 && (
+        <ul className="absolute left-0 right-0 top-full z-20 mt-1 max-h-48 overflow-auto rounded-md border border-zinc-800 bg-zinc-950 py-1 shadow-lg">
+          {suggestions.map((s) => (
+            <li key={s.id}>
+              <button
+                type="button"
+                onClick={() => {
+                  onPick(s);
+                  setOpen(false);
+                  setSuggestions([]);
+                }}
+                className="block w-full px-3 py-1.5 text-left text-xs text-zinc-200 hover:bg-zinc-900"
+              >
+                <span className="font-medium">{s.name}</span>
+                <span className="ml-2 text-zinc-500">
+                  {VEHICLE_TYPE_LABELS[s.type]} · {VEHICLE_ERA_LABELS[s.era]}
+                  {s.nation ? ` · ${s.nation}` : ''}
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function Input(props: {
+  placeholder?: string;
+  value: string;
+  onChange: (v: string) => void;
+  type?: string;
+  disabled?: boolean;
+}) {
+  return (
+    <input
+      type={props.type ?? 'text'}
+      placeholder={props.placeholder}
+      value={props.value}
+      onChange={(e) => props.onChange(e.target.value)}
+      disabled={props.disabled}
+      className="rounded border border-zinc-800 bg-zinc-900 px-2 py-1.5 text-xs text-zinc-100 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none disabled:opacity-50"
+    />
+  );
+}
+
+function Select(props: {
+  value: string;
+  onChange: (v: string) => void;
+  options: { value: string; label: string }[];
+  disabled?: boolean;
+}) {
+  return (
+    <select
+      value={props.value}
+      onChange={(e) => props.onChange(e.target.value)}
+      disabled={props.disabled}
+      className="rounded border border-zinc-800 bg-zinc-900 px-2 py-1.5 text-xs text-zinc-100 focus:border-zinc-600 focus:outline-none disabled:opacity-50"
+    >
+      {props.options.map((o) => (
+        <option key={o.value} value={o.value}>{o.label}</option>
+      ))}
+    </select>
+  );
+}
+
+function StatusPill({ status }: { status: Status }) {
+  const map: Record<Status, { label: string; cls: string }> = {
+    uploading: { label: 'uploading',  cls: 'bg-zinc-800 text-zinc-300' },
+    ready:     { label: 'ready',      cls: 'bg-amber-900 text-amber-200' },
+    saving:    { label: 'saving',     cls: 'bg-zinc-800 text-zinc-300' },
+    saved:     { label: 'saved',      cls: 'bg-emerald-900 text-emerald-200' },
+    error:     { label: 'error',      cls: 'bg-red-900 text-red-200' },
+  };
+  const { label, cls } = map[status];
+  return (
+    <span className={`rounded px-1.5 py-0.5 text-[10px] uppercase tracking-wider ${cls}`}>
+      {label}
+    </span>
+  );
+}

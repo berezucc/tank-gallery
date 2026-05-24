@@ -1,0 +1,50 @@
+import Image from 'next/image';
+import Link from 'next/link';
+import { publicPhotoUrl } from '@/lib/storage';
+import { blurhashToDataUrl } from '@/lib/blurhash';
+import type { VehicleWithPhotos } from '@/types';
+
+interface Props {
+  vehicle: VehicleWithPhotos;
+  // Existing filter params, so clicking a card preserves them in the URL.
+  searchParams: Record<string, string | undefined>;
+}
+
+export async function GalleryCard({ vehicle, searchParams }: Props) {
+  const hero = vehicle.photos[0];
+  if (!hero) return null;
+
+  const params = new URLSearchParams();
+  for (const [k, v] of Object.entries(searchParams)) {
+    if (v) params.set(k, v);
+  }
+  params.set('photo', vehicle.id);
+
+  const aspect = hero.width && hero.height ? hero.width / hero.height : 4 / 3;
+  const blurDataURL = await blurhashToDataUrl(hero.blurhash);
+
+  return (
+    <Link
+      href={`/?${params.toString()}`}
+      scroll={false}
+      prefetch={false}
+      className="group relative mb-1 block overflow-hidden bg-zinc-900"
+      style={{ aspectRatio: aspect }}
+    >
+      <Image
+        src={publicPhotoUrl(hero.storage_path)}
+        alt={vehicle.name}
+        fill
+        sizes="(min-width: 1280px) 20vw, (min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
+        className="object-cover transition-transform duration-500 group-hover:scale-105"
+        {...(blurDataURL ? { placeholder: 'blur' as const, blurDataURL } : {})}
+      />
+      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-3">
+        <p className="text-sm font-medium text-white">{vehicle.name}</p>
+        {vehicle.photos.length > 1 && (
+          <p className="text-xs text-zinc-400">{vehicle.photos.length} photos</p>
+        )}
+      </div>
+    </Link>
+  );
+}
