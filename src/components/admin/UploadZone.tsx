@@ -19,6 +19,7 @@ interface AiSuggestion {
   era: VehicleEra;
   nation: string;
   confidence: 'high' | 'medium' | 'low';
+  existing_match?: string;
 }
 
 interface ExistingVehicle {
@@ -78,10 +79,20 @@ export function UploadZone() {
     }));
     setItems((prev) => [...prev, ...newItems]);
 
-    await Promise.all(newItems.map((item) => Promise.all([
-      uploadOne(item, setItems),
-      classifyOne(item, setItems),
-    ])));
+    // Process with limited concurrency so 200 files don't fire 400 API calls at once.
+    // 5 concurrent items × 2 parallel calls each (upload + classify) = 10 in flight.
+    const CONCURRENCY = 5;
+    const queue = [...newItems];
+    const workers = Array.from({ length: CONCURRENCY }, async () => {
+      while (queue.length > 0) {
+        const item = queue.shift()!;
+        await Promise.all([
+          uploadOne(item, setItems),
+          classifyOne(item, setItems),
+        ]);
+      }
+    });
+    await Promise.all(workers);
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -147,7 +158,22 @@ export function UploadZone() {
     setItems((prev) => prev.filter((it) => it.id !== id));
   }
 
-  const hasUnsaved = items.some((i) => i.status === 'ready' || i.status === 'error');
+  const [savingAll, setSavingAll] = useState(false);
+  const readyItems   = items.filter((i) => i.status === 'ready');
+  const savableItems = items.filter((i) => i.status === 'ready' || i.status === 'error');
+  const savedCount   = items.filter((i) => i.status === 'saved').length;
+  const uploadingCount = items.filter((i) => i.status === 'uploading').length;
+  const allDone      = items.length > 0 && items.every((i) => i.status === 'saved');
+
+  async function saveAll() {
+    setSavingAll(true);
+    for (const item of readyItems) {
+      if (!item.upload) continue;
+      if (!item.existing && !item.name.trim()) continue;
+      await save(item);
+    }
+    setSavingAll(false);
+  }
 
   return (
     <div>
@@ -164,11 +190,48 @@ export function UploadZone() {
         <p className="text-sm text-zinc-400">
           {isDragActive ? 'Drop them here…' : 'Drag photos here, or click to select.'}
         </p>
-        <p className="mt-1 text-xs text-zinc-600">JPG, PNG, WebP — Gemini auto-fills metadata.</p>
+        <p className="mt-1 text-xs text-zinc-600">JPG, PNG, WebP — up to 200 at a time. Gemini auto-fills metadata.</p>
       </div>
 
       {items.length > 0 && (
         <div className="mt-6 space-y-4">
+          {/* Progress bar + bulk actions */}
+          <div className="flex items-center justify-between rounded-md border border-zinc-800 bg-zinc-950 px-4 py-3">
+            <div className="text-sm text-zinc-400">
+              {uploadingCount > 0 && (
+                <span>Processing {uploadingCount}… </span>
+              )}
+              {savedCount > 0 && (
+                <span className="text-emerald-400">{savedCount} saved</span>
+              )}
+              {savableItems.length > 0 && (
+                <span> · {savableItems.length} ready to save</span>
+              )}
+              {items.length > 0 && (
+                <span className="text-zinc-600"> · {items.length} total</span>
+              )}
+            </div>
+            <div className="flex gap-2">
+              {readyItems.length > 1 && (
+                <button
+                  onClick={saveAll}
+                  disabled={savingAll}
+                  className="rounded-md bg-zinc-100 px-3 py-1.5 text-xs font-medium text-zinc-900 hover:bg-white disabled:opacity-50"
+                >
+                  {savingAll ? `Saving ${readyItems.length}…` : `Save all (${readyItems.length})`}
+                </button>
+              )}
+              {allDone && (
+                <button
+                  onClick={() => router.push('/admin')}
+                  className="rounded-md bg-zinc-100 px-3 py-1.5 text-xs font-medium text-zinc-900 hover:bg-white"
+                >
+                  Done — back to dashboard
+                </button>
+              )}
+            </div>
+          </div>
+
           {items.map((item) => (
             <ItemCard
               key={item.id}
@@ -188,20 +251,6 @@ export function UploadZone() {
               onRemove={() => removeItem(item.id)}
             />
           ))}
-
-          {items.every((i) => i.status === 'saved') && (
-            <button
-              onClick={() => router.push('/admin')}
-              className="w-full rounded-md bg-zinc-100 px-3 py-2 text-sm font-medium text-zinc-900 hover:bg-white"
-            >
-              Done — back to dashboard
-            </button>
-          )}
-          {hasUnsaved && (
-            <p className="text-xs text-zinc-600">
-              Review the AI suggestions, edit as needed, and hit Save. Unsaved items will be lost on refresh.
-            </p>
-          )}
         </div>
       )}
     </div>
@@ -244,6 +293,28 @@ async function classifyOne(
       if (it.metadataTouched || it.existing) {
         return { ...it, ai, classifying: false };
       }
+
+      // If AI matched an existing vehicle, auto-attach
+      if (ai.existing_match) {
+        return {
+          ...it,
+          ai,
+          classifying: false,
+          name:   ai.name,
+          type:   ai.type,
+          era:    ai.era,
+          nation: ai.nation,
+          metadataTouched: true,
+          existing: {
+            id:     ai.existing_match,
+            name:   ai.name,
+            type:   ai.type,
+            era:    ai.era,
+            nation: ai.nation || null,
+          },
+        };
+      }
+
       return {
         ...it,
         ai,

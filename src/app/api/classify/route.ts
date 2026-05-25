@@ -1,14 +1,15 @@
 import { NextResponse } from 'next/server';
-import { classifyVehicleImage } from '@/lib/gemini';
+import { createClient } from '@/lib/supabase/server';
+import { classifyVehicleImage, classifyWithGalleryContext } from '@/lib/gemini';
+import type { GalleryVehicleRef } from '@/lib/gemini';
 
 // Body: multipart/form-data with a single `file` field.
-// Returns: { name, type, era, nation, confidence }
+// Returns: { name, type, era, nation, confidence, existing_match? }
 //
-// PUBLIC endpoint — used by both the admin upload flow and the /identify page.
-// Cost note: each call consumes one Gemini request. Free tier is 250/day, so
-// a public route is theoretically abusable. The 5MB file cap + browser-side
-// throttling keep casual abuse in check; for real public deploys, add IP rate
-// limiting (e.g. Upstash Redis) before exposing widely.
+// When the caller is an authenticated admin, the classifier is enriched with
+// the existing vehicle catalog — Gemini matches against known vehicles first,
+// which is dramatically more accurate than open-ended guessing. For the public
+// /identify page (no auth), uses the basic prompt with no gallery context.
 const MAX_BYTES = 5 * 1024 * 1024;
 
 export async function POST(request: Request) {
@@ -26,8 +27,29 @@ export async function POST(request: Request) {
 
   const buf = Buffer.from(await file.arrayBuffer());
 
+  // Check if caller is an authenticated admin
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
   try {
-    const result = await classifyVehicleImage(buf, file.type || 'image/jpeg');
+    let result;
+    if (user) {
+      // Admin: include gallery catalog for context-aware matching
+      const { data: vehicles } = await supabase
+        .from('vehicles')
+        .select('id, name, type, era, nation')
+        .returns<GalleryVehicleRef[]>();
+
+      if (vehicles && vehicles.length > 0) {
+        result = await classifyWithGalleryContext(buf, file.type || 'image/jpeg', vehicles);
+      } else {
+        result = await classifyVehicleImage(buf, file.type || 'image/jpeg');
+      }
+    } else {
+      // Public: basic classification, no gallery data exposed
+      result = await classifyVehicleImage(buf, file.type || 'image/jpeg');
+    }
+
     return NextResponse.json(result);
   } catch (e) {
     return NextResponse.json(
