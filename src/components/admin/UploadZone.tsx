@@ -59,8 +59,9 @@ interface ExistingVehicle {
 
 interface PendingItem {
   id: string;
-  file: File;
-  previewUrl: string;
+  file: File | null;
+  fileName: string;
+  previewUrl: string | null;
   status: Status;
   errorMsg?: string;
   classifying: boolean;
@@ -72,7 +73,6 @@ interface PendingItem {
     width: number;
     height: number;
   };
-  // Form state:
   name: string;
   type: VehicleType;
   era: VehicleEra;
@@ -80,19 +80,68 @@ interface PendingItem {
   location: string;
   date: string;
   metadataTouched: boolean;
-  // Set when user picks an existing vehicle from the autocomplete; in that case
-  // save sends { vehicle_id } instead of { vehicle: {...} }.
   existing?: ExistingVehicle;
+}
+
+const STORAGE_KEY = 'tank-gallery-pending-uploads';
+
+function persistItems(items: PendingItem[]) {
+  const saveable = items
+    .filter((i) => i.status === 'ready' || i.status === 'error')
+    .filter((i) => i.upload)
+    .map((i) => ({
+      id: i.id, fileName: i.fileName, upload: i.upload, ai: i.ai,
+      name: i.name, type: i.type, era: i.era, nation: i.nation,
+      location: i.location, date: i.date,
+      metadataTouched: i.metadataTouched, existing: i.existing,
+    }));
+  if (saveable.length > 0) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(saveable));
+  } else {
+    localStorage.removeItem(STORAGE_KEY);
+  }
+}
+
+function loadPersistedItems(): PendingItem[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as Array<Record<string, unknown>>;
+    return parsed.map((p) => ({
+      id:       (p.id as string) || crypto.randomUUID(),
+      file:     null,
+      fileName: (p.fileName as string) || 'restored',
+      previewUrl: null,
+      status:   'ready' as Status,
+      classifying: false,
+      ai:       p.ai as AiSuggestion | undefined,
+      upload:   p.upload as PendingItem['upload'],
+      name:     (p.name as string) ?? '',
+      type:     (p.type as VehicleType) ?? 'other',
+      era:      (p.era as VehicleEra) ?? 'other',
+      nation:   (p.nation as string) ?? '',
+      location: (p.location as string) ?? '',
+      date:     (p.date as string) ?? '',
+      metadataTouched: Boolean(p.metadataTouched),
+      existing: p.existing as ExistingVehicle | undefined,
+    }));
+  } catch {
+    return [];
+  }
 }
 
 export function UploadZone() {
   const router = useRouter();
-  const [items, setItems] = useState<PendingItem[]>([]);
+  const [items, setItems] = useState<PendingItem[]>(() => loadPersistedItems());
+
+  // Persist to localStorage whenever items change (ready/error items only).
+  useEffect(() => { persistItems(items); }, [items]);
 
   const onDrop = useCallback(async (accepted: File[]) => {
     const newItems: PendingItem[] = accepted.map((file) => ({
       id: crypto.randomUUID(),
       file,
+      fileName: file.name,
       previewUrl: URL.createObjectURL(file),
       status: 'uploading',
       classifying: true,
@@ -288,10 +337,11 @@ async function uploadOne(
   item: PendingItem,
   setItems: React.Dispatch<React.SetStateAction<PendingItem[]>>
 ) {
+  if (!item.file) return;
   try {
-    const blob = await resizeImage(item.file, 3000, 0.92).catch(() => item.file);
+    const blob = await resizeImage(item.file, 3000, 0.92).catch(() => item.file!);
     const form = new FormData();
-    form.append('file', blob, item.file.name);
+    form.append('file', blob, item.fileName);
     const res = await fetch('/api/upload', { method: 'POST', body: form });
     const body = await res.json().catch(() => ({ error: res.statusText }));
     if (!res.ok) throw new Error(body.error ?? res.statusText);
@@ -309,9 +359,10 @@ async function classifyOne(
   item: PendingItem,
   setItems: React.Dispatch<React.SetStateAction<PendingItem[]>>
 ) {
-  const blob = await resizeImage(item.file, 1024, 0.8).catch(() => item.file);
+  if (!item.file) return;
+  const blob = await resizeImage(item.file, 1024, 0.8).catch(() => item.file!);
   const form = new FormData();
-  form.append('file', blob, item.file.name);
+  form.append('file', blob, item.fileName);
   try {
     const res = await fetch('/api/classify', { method: 'POST', body: form });
     if (!res.ok) throw new Error('classify failed');
@@ -371,17 +422,26 @@ interface CardProps {
 }
 
 function ItemCard({ item, onChange, onAttachExisting, onDetachExisting, onSave, onRemove }: CardProps) {
+  // For restored items (no File object), show the uploaded thumbnail from Supabase.
+  const imgSrc = item.previewUrl
+    ?? (item.upload?.thumbnail_path
+      ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/photos/${item.upload.thumbnail_path}`
+      : undefined);
+
   return (
     <div className="flex gap-4 rounded-md border border-zinc-800 bg-zinc-950 p-4">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={item.previewUrl}
-        alt={item.file.name}
-        className="h-32 w-32 flex-shrink-0 rounded object-cover"
-      />
+      {imgSrc && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={imgSrc} alt={item.fileName} className="h-32 w-32 flex-shrink-0 rounded object-cover" />
+      )}
+      {!imgSrc && (
+        <div className="flex h-32 w-32 flex-shrink-0 items-center justify-center rounded bg-zinc-900 text-xs text-zinc-600">
+          Restored
+        </div>
+      )}
       <div className="flex flex-1 flex-col gap-2">
         <div className="flex items-center justify-between gap-2">
-          <span className="truncate text-xs text-zinc-500">{item.file.name}</span>
+          <span className="truncate text-xs text-zinc-500">{item.fileName}</span>
           <div className="flex items-center gap-2">
             {item.classifying && (
               <span className="text-[10px] uppercase tracking-wider text-zinc-500">ai thinking…</span>
