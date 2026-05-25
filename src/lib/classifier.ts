@@ -19,7 +19,7 @@ export interface GalleryVehicleRef {
 }
 
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
-const MODEL = 'llama-3.2-90b-vision-preview';
+const MODEL = 'meta-llama/llama-4-scout-17b-16e-instruct';
 
 const BASIC_PROMPT = `You are a military vehicle identification expert. Identify the military vehicle in this photo.
 
