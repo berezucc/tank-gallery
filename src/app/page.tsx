@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { getGalleryVehicles } from '@/lib/supabase/queries';
+import { getGalleryTotalCount } from '@/lib/supabase/queries';
 import { FilterBar } from '@/components/gallery/FilterBar';
 import { GalleryGrid } from '@/components/gallery/GalleryGrid';
 import { Lightbox } from '@/components/gallery/Lightbox';
@@ -27,8 +28,8 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
 
   const filters  = parseFilters(flat);
   const vehicles = await getGalleryVehicles(filters);
+  const isFiltered = Boolean(filters.era || filters.type || filters.nation || filters.q);
 
-  // Flatten to one card per photo.
   const cards: PhotoCard[] = vehicles.flatMap((v) =>
     v.photos.map((p) => ({
       photo: p,
@@ -36,12 +37,14 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
     }))
   );
 
+  // Get unfiltered total for "X of Y" display
+  const totalCount = isFiltered ? await getGalleryTotalCount() : cards.length;
+
   const nationSet = new Set<string>();
   vehicles.forEach((v) => v.nation && nationSet.add(v.nation));
   if (flat.nation) nationSet.add(flat.nation);
   const availableNations = Array.from(nationSet).sort();
 
-  // Find the clicked photo + its group (same vehicle + location + date) for the lightbox carousel.
   let lightboxCards: PhotoCard[] = [];
   let lightboxIndex = 0;
   if (flat.photo) {
@@ -58,19 +61,20 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
   }
 
   return (
-    <main className="mx-auto max-w-screen-2xl px-6 pb-12 pt-6">
-      <header className="mb-6 flex items-baseline justify-between">
+    <main className="mx-auto max-w-[1800px] px-4 pb-12 pt-5 sm:px-6">
+      <header className="mb-4 flex items-end justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Tank Gallery</h1>
-          <p className="mt-1 text-sm text-zinc-500">
-            {cards.length} {cards.length === 1 ? 'photo' : 'photos'}
-            {' · '}{vehicles.length} {vehicles.length === 1 ? 'vehicle' : 'vehicles'}
+          <h1 className="text-lg font-semibold tracking-tight sm:text-xl">Tank Gallery</h1>
+          <p className="mt-0.5 text-xs tabular-nums text-zinc-500">
+            {isFiltered
+              ? `${cards.length} of ${totalCount} photos`
+              : `${cards.length} photos`}
           </p>
         </div>
-        <nav className="flex gap-4 text-sm text-zinc-400">
-          <Link href="/map"      className="hover:text-zinc-100">Map</Link>
-          <Link href="/stats"    className="hover:text-zinc-100">Stats</Link>
-          <Link href="/identify" className="hover:text-zinc-100">Identify</Link>
+        <nav className="flex gap-5 text-xs text-zinc-500">
+          <Link href="/map"      className="transition-colors hover:text-zinc-100">Map</Link>
+          <Link href="/stats"    className="transition-colors hover:text-zinc-100">Stats</Link>
+          <Link href="/identify" className="transition-colors hover:text-zinc-100">Identify</Link>
         </nav>
       </header>
 
@@ -80,10 +84,7 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
 
       <GalleryGrid cards={cards} searchParams={flat} />
 
-      <Lightbox
-        cards={lightboxCards}
-        initialIndex={lightboxIndex}
-      />
+      <Lightbox cards={lightboxCards} initialIndex={lightboxIndex} />
     </main>
   );
 }

@@ -15,9 +15,9 @@ interface Props {
 }
 
 export function FilterBar({ availableNations }: Props) {
-  const router    = useRouter();
-  const pathname  = usePathname();
-  const params    = useSearchParams();
+  const router   = useRouter();
+  const pathname = usePathname();
+  const params   = useSearchParams();
 
   const activeEra    = params.get('era')    ?? '';
   const activeType   = params.get('type')   ?? '';
@@ -25,11 +25,9 @@ export function FilterBar({ availableNations }: Props) {
   const activeQ      = params.get('q')      ?? '';
   const anyActive    = Boolean(activeEra || activeType || activeNation || activeQ);
 
-  // Local input state so typing is responsive; pushed to URL on debounce.
   const [q, setQ] = useState(activeQ);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Keep input synced if URL changes externally (e.g. clear-all).
   useEffect(() => { setQ(activeQ); }, [activeQ]);
 
   const pushParams = useCallback(
@@ -43,8 +41,8 @@ export function FilterBar({ availableNations }: Props) {
     [params, pathname, router]
   );
 
-  const updateParam = useCallback(
-    (key: 'era' | 'type' | 'nation', value: string) => {
+  const toggle = useCallback(
+    (key: string, value: string) => {
       pushParams((p) => {
         if (p.get(key) === value) p.delete(key);
         else                      p.set(key, value);
@@ -71,84 +69,99 @@ export function FilterBar({ availableNations }: Props) {
   };
 
   return (
-    <div className="sticky top-0 z-10 -mx-6 mb-6 border-b border-zinc-800 bg-[#0a0a0a]/95 px-6 py-4 backdrop-blur">
-      <div className="mb-3 flex items-center gap-3">
-        <input
-          type="search"
-          placeholder="Search vehicle names…"
-          value={q}
-          onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full max-w-sm rounded-md border border-zinc-800 bg-zinc-950 px-3 py-1.5 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none"
-        />
+    <div className="sticky top-0 z-10 -mx-4 mb-4 bg-[#0a0a0a]/90 px-4 py-3 backdrop-blur-xl sm:-mx-6 sm:px-6">
+      <div className="flex flex-wrap items-center gap-2">
+        {/* Search */}
+        <div className="relative">
+          <input
+            type="search"
+            placeholder="Search…"
+            value={q}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="h-8 w-44 rounded-full border border-zinc-800 bg-zinc-900/80 pl-3.5 pr-8 text-xs text-zinc-100 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-700"
+          />
+          {q && (
+            <button
+              onClick={() => onSearchChange('')}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
+            >
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 3l6 6M9 3l-6 6"/></svg>
+            </button>
+          )}
+        </div>
+
+        <Sep />
+
+        {/* Era */}
+        {VEHICLE_ERAS.filter((e) => e !== 'other').map((era) => (
+          <Pill key={era} active={activeEra === era} onClick={() => toggle('era', era)}>
+            {VEHICLE_ERA_LABELS[era]}
+          </Pill>
+        ))}
+
+        <Sep />
+
+        {/* Type */}
+        {VEHICLE_TYPES.filter((t) => t !== 'other').map((type) => (
+          <Pill key={type} active={activeType === type} onClick={() => toggle('type', type)}>
+            {VEHICLE_TYPE_LABELS[type]}
+          </Pill>
+        ))}
+
+        <Sep />
+
+        {/* Nation — dropdown instead of 20+ pills */}
+        <select
+          value={activeNation}
+          onChange={(e) => {
+            pushParams((p) => {
+              if (e.target.value) p.set('nation', e.target.value);
+              else                p.delete('nation');
+            });
+          }}
+          className={
+            'h-8 cursor-pointer rounded-full border px-3 text-xs focus:outline-none focus:ring-1 focus:ring-zinc-700 ' +
+            (activeNation
+              ? 'border-zinc-100 bg-zinc-100 text-zinc-900'
+              : 'border-zinc-800 bg-zinc-900/80 text-zinc-400')
+          }
+        >
+          <option value="">All nations</option>
+          {availableNations.map((n) => (
+            <option key={n} value={n}>{nationFlag(n)} {n}</option>
+          ))}
+        </select>
+
+        {/* Clear */}
         {anyActive && (
           <button
             onClick={clearAll}
-            className="text-xs text-zinc-400 underline-offset-4 hover:text-zinc-200 hover:underline"
+            className="ml-auto h-8 rounded-full border border-zinc-800 px-3 text-xs text-zinc-500 transition-colors hover:border-zinc-600 hover:text-zinc-200"
           >
-            Clear all
+            Clear
           </button>
         )}
       </div>
-
-      <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-        <FilterGroup
-          label="Era"
-          options={VEHICLE_ERAS.map((e) => ({ value: e, label: VEHICLE_ERA_LABELS[e] }))}
-          active={activeEra}
-          onToggle={(v) => updateParam('era', v)}
-        />
-        <FilterGroup
-          label="Type"
-          options={VEHICLE_TYPES.map((t) => ({ value: t, label: VEHICLE_TYPE_LABELS[t] }))}
-          active={activeType}
-          onToggle={(v) => updateParam('type', v)}
-        />
-        {availableNations.length > 0 && (
-          <FilterGroup
-            label="Nation"
-            options={availableNations.map((n) => ({
-              value: n,
-              label: nationFlag(n) ? `${nationFlag(n)} ${n}` : n,
-            }))}
-            active={activeNation}
-            onToggle={(v) => updateParam('nation', v)}
-          />
-        )}
-      </div>
     </div>
   );
 }
 
-interface GroupProps {
-  label: string;
-  options: { value: string; label: string }[];
-  active: string;
-  onToggle: (v: string) => void;
-}
-
-function FilterGroup({ label, options, active, onToggle }: GroupProps) {
+function Pill({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-2">
-      <span className="text-xs uppercase tracking-wider text-zinc-500">{label}</span>
-      <div className="flex flex-wrap gap-1.5">
-        {options.map((o) => {
-          const on = active === o.value;
-          return (
-            <button
-              key={o.value}
-              onClick={() => onToggle(o.value)}
-              className={
-                'rounded-full px-3 py-1 text-xs transition-colors ' +
-                (on
-                  ? 'bg-zinc-100 text-zinc-900'
-                  : 'bg-zinc-900 text-zinc-300 hover:bg-zinc-800')
-              }
-            >
-              {o.label}
-            </button>
-          );
-        })}
-      </div>
-    </div>
+    <button
+      onClick={onClick}
+      className={
+        'h-8 rounded-full border px-3.5 text-xs font-medium transition-all ' +
+        (active
+          ? 'border-zinc-100 bg-zinc-100 text-zinc-900'
+          : 'border-zinc-800 bg-transparent text-zinc-400 hover:border-zinc-600 hover:text-zinc-200')
+      }
+    >
+      {children}
+    </button>
   );
+}
+
+function Sep() {
+  return <div className="hidden h-4 w-px bg-zinc-800 sm:block" />;
 }

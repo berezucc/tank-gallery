@@ -36,6 +36,16 @@ export async function getGalleryVehicles(
   }));
 }
 
+// Total photo count (unfiltered), for "X of Y" display when filters are active.
+export async function getGalleryTotalCount(): Promise<number> {
+  const supabase = await createClient();
+  const { count, error } = await supabase
+    .from('photos')
+    .select('id', { count: 'exact', head: true });
+  if (error) return 0;
+  return count ?? 0;
+}
+
 // Aggregate counts for the /stats page. Done as a single fetch + JS aggregation
 // rather than multiple GROUP BY queries since the dataset is small (≤500 photos).
 export interface Stats {
