@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { classifyVehicleImage, classifyWithGalleryContext } from '@/lib/gemini';
-import type { GalleryVehicleRef } from '@/lib/gemini';
+import { classifyVehicleImage, classifyWithGalleryContext } from '@/lib/classifier';
+import type { GalleryVehicleRef } from '@/lib/classifier';
 
 // Body: multipart/form-data with a single `file` field.
 // Returns: { name, type, era, nation, confidence, existing_match? }
