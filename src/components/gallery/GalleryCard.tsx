@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { publicPhotoUrl } from '@/lib/storage';
 import { blurhashToDataUrl } from '@/lib/blurhash';
+import { nationFlag } from '@/lib/constants';
 import type { PhotoCard } from '@/types';
 
 interface Props {
@@ -38,7 +39,9 @@ export async function GalleryCard({ card, searchParams }: Props) {
         {...(blurDataURL ? { placeholder: 'blur' as const, blurDataURL } : {})}
       />
       <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-3">
-        <p className="text-sm font-medium text-white">{vehicle.name}</p>
+        <p className="text-sm font-medium text-white">
+          {nationFlag(vehicle.nation) ? `${nationFlag(vehicle.nation)} ` : ''}{vehicle.name}
+        </p>
         {photo.location_taken && (
           <p className="text-xs text-zinc-400">{photo.location_taken}</p>
         )}

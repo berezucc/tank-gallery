@@ -7,6 +7,7 @@ import {
   VEHICLE_ERAS,
   VEHICLE_TYPE_LABELS,
   VEHICLE_ERA_LABELS,
+  nationFlag,
 } from '@/lib/constants';
 
 interface Props {
@@ -105,7 +106,10 @@ export function FilterBar({ availableNations }: Props) {
         {availableNations.length > 0 && (
           <FilterGroup
             label="Nation"
-            options={availableNations.map((n) => ({ value: n, label: n }))}
+            options={availableNations.map((n) => ({
+              value: n,
+              label: nationFlag(n) ? `${nationFlag(n)} ${n}` : n,
+            }))}
             active={activeNation}
             onToggle={(v) => updateParam('nation', v)}
           />
