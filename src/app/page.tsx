@@ -5,7 +5,7 @@ import { FilterBar } from '@/components/gallery/FilterBar';
 import { GalleryGrid } from '@/components/gallery/GalleryGrid';
 import { Lightbox } from '@/components/gallery/Lightbox';
 import { VEHICLE_TYPES, VEHICLE_ERAS } from '@/lib/constants';
-import type { GalleryFilters, VehicleType, VehicleEra } from '@/types';
+import type { GalleryFilters, VehicleType, VehicleEra, PhotoCard } from '@/types';
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -20,7 +20,6 @@ function parseFilters(raw: Record<string, string | undefined>): GalleryFilters {
 
 export default async function Home({ searchParams }: { searchParams: SearchParams }) {
   const raw = await searchParams;
-  // Coerce string | string[] | undefined → string | undefined (we only use the first value).
   const flat: Record<string, string | undefined> = {};
   for (const [k, v] of Object.entries(raw)) {
     flat[k] = Array.isArray(v) ? v[0] : v;
@@ -29,17 +28,35 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
   const filters  = parseFilters(flat);
   const vehicles = await getGalleryVehicles(filters);
 
-  // Distinct nations from the unfiltered set would require a second query — for now
-  // derive them from the current result set, plus any active nation filter so the
-  // pill stays visible even when it's the only match.
+  // Flatten to one card per photo.
+  const cards: PhotoCard[] = vehicles.flatMap((v) =>
+    v.photos.map((p) => ({
+      photo: p,
+      vehicle: { id: v.id, name: v.name, type: v.type, era: v.era, nation: v.nation, created_at: v.created_at },
+    }))
+  );
+
   const nationSet = new Set<string>();
   vehicles.forEach((v) => v.nation && nationSet.add(v.nation));
   if (flat.nation) nationSet.add(flat.nation);
   const availableNations = Array.from(nationSet).sort();
 
-  const openVehicle = flat.photo
-    ? vehicles.find((v) => v.id === flat.photo) ?? null
-    : null;
+  // Find the clicked photo + its group (same vehicle + location + date) for the lightbox carousel.
+  let lightboxCards: PhotoCard[] = [];
+  let lightboxIndex = 0;
+  if (flat.photo) {
+    const clicked = cards.find((c) => c.photo.id === flat.photo);
+    if (clicked) {
+      lightboxCards = cards.filter(
+        (c) =>
+          c.vehicle.id === clicked.vehicle.id &&
+          c.photo.location_taken === clicked.photo.location_taken &&
+          c.photo.date_taken === clicked.photo.date_taken
+      );
+      lightboxIndex = lightboxCards.findIndex((c) => c.photo.id === flat.photo);
+      if (lightboxIndex < 0) lightboxIndex = 0;
+    }
+  }
 
   return (
     <main className="mx-auto max-w-screen-2xl px-6 pb-12 pt-6">
@@ -47,7 +64,8 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Tank Gallery</h1>
           <p className="mt-1 text-sm text-zinc-500">
-            {vehicles.length} {vehicles.length === 1 ? 'vehicle' : 'vehicles'}
+            {cards.length} {cards.length === 1 ? 'photo' : 'photos'}
+            {' · '}{vehicles.length} {vehicles.length === 1 ? 'vehicle' : 'vehicles'}
           </p>
         </div>
         <nav className="flex gap-4 text-sm text-zinc-400">
@@ -61,9 +79,12 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
         <FilterBar availableNations={availableNations} />
       </Suspense>
 
-      <GalleryGrid vehicles={vehicles} searchParams={flat} />
+      <GalleryGrid cards={cards} searchParams={flat} />
 
-      <Lightbox vehicle={openVehicle} />
+      <Lightbox
+        cards={lightboxCards}
+        initialIndex={lightboxIndex}
+      />
     </main>
   );
 }

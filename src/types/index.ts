@@ -33,9 +33,17 @@ export interface VehicleWithPhotos extends Vehicle {
   photos: Photo[];
 }
 
+// A photo card in the gallery grid. Each photo gets its own card.
+// Photos with the same vehicle + location + date are grouped into a
+// carousel in the lightbox.
+export interface PhotoCard {
+  photo: Photo;
+  vehicle: Vehicle;
+}
+
 export interface GalleryFilters {
   era?: VehicleEra;
   type?: VehicleType;
   nation?: string;
-  q?: string;  // full-text-ish search on vehicle name
+  q?: string;
 }

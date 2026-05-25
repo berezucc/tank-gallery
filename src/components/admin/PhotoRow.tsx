@@ -25,30 +25,49 @@ interface Props {
   storagePath: string;
   thumbnailPath: string | null;
   vehicle: Vehicle | null;
+  locationTaken: string | null;
+  dateTaken: string | null;
 }
 
-export function PhotoRow({ photoId, storagePath, thumbnailPath, vehicle }: Props) {
+export function PhotoRow({ photoId, storagePath, thumbnailPath, vehicle, locationTaken, dateTaken }: Props) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [busy,    setBusy]    = useState(false);
-  const [name,    setName]    = useState(vehicle?.name   ?? '');
-  const [type,    setType]    = useState<VehicleType>(vehicle?.type ?? 'other');
-  const [era,     setEra]     = useState<VehicleEra>(vehicle?.era  ?? 'other');
-  const [nation,  setNation]  = useState(vehicle?.nation ?? '');
-  const [error,   setError]   = useState<string | null>(null);
+  const [name,     setName]     = useState(vehicle?.name   ?? '');
+  const [type,     setType]     = useState<VehicleType>(vehicle?.type ?? 'other');
+  const [era,      setEra]      = useState<VehicleEra>(vehicle?.era  ?? 'other');
+  const [nation,   setNation]   = useState(vehicle?.nation ?? '');
+  const [location, setLocation] = useState(locationTaken ?? '');
+  const [date,     setDate]     = useState(dateTaken ?? '');
+  const [error,    setError]    = useState<string | null>(null);
 
   async function onSave() {
     if (!vehicle) return;
     setBusy(true);
     setError(null);
-    const res = await fetch(`/api/vehicles/${vehicle.id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, type, era, nation: nation.trim() || null }),
-    });
-    const body = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      setError(body.error ?? res.statusText);
+
+    // Update vehicle metadata + photo metadata in parallel
+    const [vRes, pRes] = await Promise.all([
+      fetch(`/api/vehicles/${vehicle.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, type, era, nation: nation.trim() || null }),
+      }),
+      fetch(`/api/photos/${photoId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          location_taken: location.trim() || null,
+          date_taken: date || null,
+        }),
+      }),
+    ]);
+
+    const vBody = await vRes.json().catch(() => ({}));
+    const pBody = await pRes.json().catch(() => ({}));
+
+    if (!vRes.ok || !pRes.ok) {
+      setError(vBody.error ?? pBody.error ?? 'Save failed');
       setBusy(false);
       return;
     }
@@ -62,6 +81,8 @@ export function PhotoRow({ photoId, storagePath, thumbnailPath, vehicle }: Props
     setType(vehicle?.type ?? 'other');
     setEra(vehicle?.era ?? 'other');
     setNation(vehicle?.nation ?? '');
+    setLocation(locationTaken ?? '');
+    setDate(dateTaken ?? '');
     setError(null);
     setEditing(false);
   }
@@ -78,6 +99,8 @@ export function PhotoRow({ photoId, storagePath, thumbnailPath, vehicle }: Props
     }
     router.refresh();
   }
+
+  const inputCls = 'rounded border border-zinc-800 bg-zinc-900 px-2 py-1 text-xs text-zinc-100 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none';
 
   return (
     <tr className="hover:bg-zinc-950 align-top">
@@ -96,19 +119,17 @@ export function PhotoRow({ photoId, storagePath, thumbnailPath, vehicle }: Props
       {editing && vehicle ? (
         <>
           <td className="px-3 py-2" colSpan={4}>
-            <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
-              <input value={name}   onChange={(e) => setName(e.target.value)}
-                className="rounded border border-zinc-800 bg-zinc-900 px-2 py-1 text-xs text-zinc-100 focus:border-zinc-600 focus:outline-none" />
-              <select value={type} onChange={(e) => setType(e.target.value as VehicleType)}
-                className="rounded border border-zinc-800 bg-zinc-900 px-2 py-1 text-xs text-zinc-100 focus:border-zinc-600 focus:outline-none">
+            <div className="grid grid-cols-2 gap-2 lg:grid-cols-3">
+              <input value={name} onChange={(e) => setName(e.target.value)} placeholder="name" className={inputCls} />
+              <select value={type} onChange={(e) => setType(e.target.value as VehicleType)} className={inputCls}>
                 {VEHICLE_TYPES.map((t) => <option key={t} value={t}>{VEHICLE_TYPE_LABELS[t]}</option>)}
               </select>
-              <select value={era} onChange={(e) => setEra(e.target.value as VehicleEra)}
-                className="rounded border border-zinc-800 bg-zinc-900 px-2 py-1 text-xs text-zinc-100 focus:border-zinc-600 focus:outline-none">
+              <select value={era} onChange={(e) => setEra(e.target.value as VehicleEra)} className={inputCls}>
                 {VEHICLE_ERAS.map((e) => <option key={e} value={e}>{VEHICLE_ERA_LABELS[e]}</option>)}
               </select>
-              <input value={nation} onChange={(e) => setNation(e.target.value)} placeholder="nation"
-                className="rounded border border-zinc-800 bg-zinc-900 px-2 py-1 text-xs text-zinc-100 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none" />
+              <input value={nation} onChange={(e) => setNation(e.target.value)} placeholder="nation" className={inputCls} />
+              <input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="location / museum" className={inputCls} />
+              <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={inputCls} />
             </div>
             {error && <p className="mt-1 text-xs text-red-400">{error}</p>}
           </td>
@@ -137,7 +158,8 @@ export function PhotoRow({ photoId, storagePath, thumbnailPath, vehicle }: Props
             {vehicle ? VEHICLE_ERA_LABELS[vehicle.era] : '—'}
           </td>
           <td className="px-3 py-2 text-zinc-400">
-            {vehicle?.nation ?? '—'}
+            <div>{vehicle?.nation ?? '—'}</div>
+            {locationTaken && <div className="text-xs text-zinc-600">{locationTaken}</div>}
           </td>
           <td className="px-3 py-2 text-right">
             <div className="flex justify-end gap-3">

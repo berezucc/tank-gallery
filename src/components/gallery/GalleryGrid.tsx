@@ -1,13 +1,13 @@
 import { GalleryCard } from './GalleryCard';
-import type { VehicleWithPhotos } from '@/types';
+import type { PhotoCard } from '@/types';
 
 interface Props {
-  vehicles: VehicleWithPhotos[];
+  cards: PhotoCard[];
   searchParams: Record<string, string | undefined>;
 }
 
-export function GalleryGrid({ vehicles, searchParams }: Props) {
-  if (vehicles.length === 0) {
+export function GalleryGrid({ cards, searchParams }: Props) {
+  if (cards.length === 0) {
     return (
       <div className="py-24 text-center text-zinc-500">
         No photos match these filters.
@@ -17,9 +17,9 @@ export function GalleryGrid({ vehicles, searchParams }: Props) {
 
   return (
     <div className="columns-2 gap-1 sm:columns-3 lg:columns-4 xl:columns-5">
-      {vehicles.map((v) => (
-        <div key={v.id} className="break-inside-avoid">
-          <GalleryCard vehicle={v} searchParams={searchParams} />
+      {cards.map((c) => (
+        <div key={c.photo.id} className="break-inside-avoid">
+          <GalleryCard card={c} searchParams={searchParams} />
         </div>
       ))}
     </div>

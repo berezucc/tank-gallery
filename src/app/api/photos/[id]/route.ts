@@ -2,6 +2,40 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { STORAGE_BUCKET } from '@/lib/constants';
 
+// PATCH /api/photos/[id]
+// Body (all optional): { location_taken?, date_taken? }
+export async function PATCH(
+  request: Request,
+  context: { params: Promise<{ id: string }> }
+) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const { id } = await context.params;
+  const body = await request.json();
+
+  const patch: Record<string, unknown> = {};
+  if (typeof body?.location_taken === 'string') patch.location_taken = body.location_taken.trim() || null;
+  if (body?.location_taken === null)            patch.location_taken = null;
+  if (typeof body?.date_taken === 'string')     patch.date_taken = body.date_taken || null;
+  if (body?.date_taken === null)                patch.date_taken = null;
+
+  if (Object.keys(patch).length === 0) {
+    return NextResponse.json({ error: 'nothing to update' }, { status: 400 });
+  }
+
+  const { data, error } = await supabase
+    .from('photos')
+    .update(patch)
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json(data);
+}
+
 // Deletes a photo row and removes its storage objects.
 // Also deletes the parent vehicle if no other photos remain for it.
 export async function DELETE(

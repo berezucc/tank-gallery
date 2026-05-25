@@ -6,17 +6,21 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { publicPhotoUrl } from '@/lib/storage';
 import { VEHICLE_ERA_LABELS, VEHICLE_TYPE_LABELS } from '@/lib/constants';
-import type { VehicleWithPhotos } from '@/types';
+import type { PhotoCard } from '@/types';
 
 interface Props {
-  vehicle: VehicleWithPhotos | null;
+  cards: PhotoCard[];
+  initialIndex: number;
 }
 
-export function Lightbox({ vehicle }: Props) {
+export function Lightbox({ cards, initialIndex }: Props) {
   const router   = useRouter();
   const pathname = usePathname();
   const params   = useSearchParams();
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState(initialIndex);
+
+  const isOpen = cards.length > 0;
+  const current = cards[index] ?? null;
 
   const close = useCallback(() => {
     const next = new URLSearchParams(params.toString());
@@ -25,26 +29,22 @@ export function Lightbox({ vehicle }: Props) {
     router.push(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
   }, [params, pathname, router]);
 
-  // Reset carousel index when the open vehicle changes.
-  useEffect(() => {
-    setIndex(0);
-  }, [vehicle?.id]);
+  useEffect(() => { setIndex(initialIndex); }, [initialIndex]);
 
-  // Keyboard nav.
   useEffect(() => {
-    if (!vehicle) return;
+    if (!isOpen) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape')     close();
-      if (e.key === 'ArrowRight') setIndex((i) => Math.min(i + 1, vehicle.photos.length - 1));
+      if (e.key === 'ArrowRight') setIndex((i) => Math.min(i + 1, cards.length - 1));
       if (e.key === 'ArrowLeft')  setIndex((i) => Math.max(i - 1, 0));
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [vehicle, close]);
+  }, [isOpen, cards.length, close]);
 
   return (
     <AnimatePresence>
-      {vehicle && (
+      {isOpen && current && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -64,7 +64,7 @@ export function Lightbox({ vehicle }: Props) {
           </button>
 
           <motion.div
-            key={vehicle.id}
+            key={current.photo.id}
             initial={{ scale: 0.96, opacity: 0 }}
             animate={{ scale: 1,    opacity: 1 }}
             exit={{    scale: 0.96, opacity: 0 }}
@@ -72,20 +72,18 @@ export function Lightbox({ vehicle }: Props) {
             className="relative flex h-full w-full max-w-6xl flex-col items-center justify-center gap-4"
             onClick={(e) => e.stopPropagation()}
           >
-            {vehicle.photos[index] && (
-              <div className="relative flex max-h-[75vh] w-full flex-1 items-center justify-center">
-                <Image
-                  src={publicPhotoUrl(vehicle.photos[index].storage_path)}
-                  alt={vehicle.name}
-                  width={vehicle.photos[index].width  ?? 1600}
-                  height={vehicle.photos[index].height ?? 1200}
-                  className="max-h-[75vh] w-auto object-contain"
-                  priority
-                />
-              </div>
-            )}
+            <div className="relative flex max-h-[75vh] w-full flex-1 items-center justify-center">
+              <Image
+                src={publicPhotoUrl(current.photo.storage_path)}
+                alt={current.vehicle.name}
+                width={current.photo.width  ?? 1600}
+                height={current.photo.height ?? 1200}
+                className="max-h-[75vh] w-auto object-contain"
+                priority
+              />
+            </div>
 
-            {vehicle.photos.length > 1 && (
+            {cards.length > 1 && (
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setIndex((i) => Math.max(i - 1, 0))}
@@ -96,11 +94,11 @@ export function Lightbox({ vehicle }: Props) {
                   ←
                 </button>
                 <span className="text-xs text-zinc-500">
-                  {index + 1} / {vehicle.photos.length}
+                  {index + 1} / {cards.length}
                 </span>
                 <button
-                  onClick={() => setIndex((i) => Math.min(i + 1, vehicle.photos.length - 1))}
-                  disabled={index === vehicle.photos.length - 1}
+                  onClick={() => setIndex((i) => Math.min(i + 1, cards.length - 1))}
+                  disabled={index === cards.length - 1}
                   className="rounded-full bg-zinc-900 px-3 py-1 text-sm text-zinc-300 disabled:opacity-30 hover:bg-zinc-800"
                   aria-label="Next photo"
                 >
@@ -110,15 +108,13 @@ export function Lightbox({ vehicle }: Props) {
             )}
 
             <div className="text-center">
-              <h2 className="text-xl font-semibold text-white">{vehicle.name}</h2>
+              <h2 className="text-xl font-semibold text-white">{current.vehicle.name}</h2>
               <p className="mt-1 text-sm text-zinc-400">
-                {VEHICLE_TYPE_LABELS[vehicle.type]} · {VEHICLE_ERA_LABELS[vehicle.era]}
-                {vehicle.nation ? ` · ${vehicle.nation}` : ''}
+                {VEHICLE_TYPE_LABELS[current.vehicle.type]} · {VEHICLE_ERA_LABELS[current.vehicle.era]}
+                {current.vehicle.nation ? ` · ${current.vehicle.nation}` : ''}
               </p>
-              {vehicle.photos[index]?.location_taken && (
-                <p className="mt-1 text-xs text-zinc-500">
-                  {vehicle.photos[index].location_taken}
-                </p>
+              {current.photo.location_taken && (
+                <p className="mt-1 text-xs text-zinc-500">{current.photo.location_taken}</p>
               )}
             </div>
           </motion.div>

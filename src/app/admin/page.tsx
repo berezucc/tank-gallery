@@ -9,6 +9,8 @@ interface PhotoListRow {
   id: string;
   storage_path: string;
   thumbnail_path: string | null;
+  location_taken: string | null;
+  date_taken: string | null;
   created_at: string;
   vehicle: {
     id: string;
@@ -25,7 +27,7 @@ export default async function AdminDashboard() {
   const { data: photos, error } = await supabase
     .from('photos')
     .select(`
-      id, storage_path, thumbnail_path, created_at,
+      id, storage_path, thumbnail_path, location_taken, date_taken, created_at,
       vehicle:vehicles(id, name, type, era, nation)
     `)
     .order('created_at', { ascending: false })
@@ -75,6 +77,8 @@ export default async function AdminDashboard() {
                   storagePath={p.storage_path}
                   thumbnailPath={p.thumbnail_path}
                   vehicle={p.vehicle}
+                  locationTaken={p.location_taken}
+                  dateTaken={p.date_taken}
                 />
               ))}
             </tbody>

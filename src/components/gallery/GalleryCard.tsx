@@ -2,26 +2,24 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { publicPhotoUrl } from '@/lib/storage';
 import { blurhashToDataUrl } from '@/lib/blurhash';
-import type { VehicleWithPhotos } from '@/types';
+import type { PhotoCard } from '@/types';
 
 interface Props {
-  vehicle: VehicleWithPhotos;
-  // Existing filter params, so clicking a card preserves them in the URL.
+  card: PhotoCard;
   searchParams: Record<string, string | undefined>;
 }
 
-export async function GalleryCard({ vehicle, searchParams }: Props) {
-  const hero = vehicle.photos[0];
-  if (!hero) return null;
+export async function GalleryCard({ card, searchParams }: Props) {
+  const { photo, vehicle } = card;
 
   const params = new URLSearchParams();
   for (const [k, v] of Object.entries(searchParams)) {
     if (v) params.set(k, v);
   }
-  params.set('photo', vehicle.id);
+  params.set('photo', photo.id);
 
-  const aspect = hero.width && hero.height ? hero.width / hero.height : 4 / 3;
-  const blurDataURL = await blurhashToDataUrl(hero.blurhash);
+  const aspect = photo.width && photo.height ? photo.width / photo.height : 4 / 3;
+  const blurDataURL = await blurhashToDataUrl(photo.blurhash);
 
   return (
     <Link
@@ -32,7 +30,7 @@ export async function GalleryCard({ vehicle, searchParams }: Props) {
       style={{ aspectRatio: aspect }}
     >
       <Image
-        src={publicPhotoUrl(hero.storage_path)}
+        src={publicPhotoUrl(photo.thumbnail_path ?? photo.storage_path)}
         alt={vehicle.name}
         fill
         sizes="(min-width: 1280px) 20vw, (min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
@@ -41,8 +39,8 @@ export async function GalleryCard({ vehicle, searchParams }: Props) {
       />
       <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-3">
         <p className="text-sm font-medium text-white">{vehicle.name}</p>
-        {vehicle.photos.length > 1 && (
-          <p className="text-xs text-zinc-400">{vehicle.photos.length} photos</p>
+        {photo.location_taken && (
+          <p className="text-xs text-zinc-400">{photo.location_taken}</p>
         )}
       </div>
     </Link>
