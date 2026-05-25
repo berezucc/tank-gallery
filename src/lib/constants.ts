@@ -54,6 +54,7 @@ const NATION_FLAG_MAP: Record<string, string> = {
 // Resolves a nation string (possibly dual like "UK/USA") to flag emoji(s).
 export function nationFlag(nation: string | null): string {
   if (!nation) return '';
+  if (NATION_FLAG_MAP[nation]) return NATION_FLAG_MAP[nation];
   if (nation.includes('/')) {
     return nation
       .split('/')
