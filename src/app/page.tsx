@@ -21,7 +21,9 @@ function parseFilters(raw: Record<string, string | undefined>): GalleryFilters {
 function groupPhotos(cards: PhotoCard[]): PhotoGroup[] {
   const map = new Map<string, PhotoGroup>();
   for (const c of cards) {
-    const key = `${c.vehicle.id}|${c.photo.location_taken ?? ''}`;
+    // Group by vehicle NAME + location (not ID) so duplicate vehicle rows
+    // with the same name still merge into one gallery card.
+    const key = `${c.vehicle.name}|${c.photo.location_taken ?? ''}`;
     const existing = map.get(key);
     if (existing) {
       existing.photos.push(c.photo);
