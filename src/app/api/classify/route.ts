@@ -32,24 +32,10 @@ export async function POST(request: Request) {
   const { data: { user } } = await supabase.auth.getUser();
 
   try {
-    let result;
-    if (user) {
-      // Admin: include gallery catalog for context-aware matching
-      const { data: vehicles } = await supabase
-        .from('vehicles')
-        .select('id, name, type, era, nation')
-        .returns<GalleryVehicleRef[]>();
-
-      if (vehicles && vehicles.length > 0) {
-        result = await classifyWithGalleryContext(buf, file.type || 'image/jpeg', vehicles);
-      } else {
-        result = await classifyVehicleImage(buf, file.type || 'image/jpeg');
-      }
-    } else {
-      // Public: basic classification, no gallery data exposed
-      result = await classifyVehicleImage(buf, file.type || 'image/jpeg');
-    }
-
+    // Llama 4 Scout returns empty fields when given long gallery catalogs,
+    // so we always use the basic prompt. The admin UI's autocomplete handles
+    // matching to existing vehicles instead.
+    const result = await classifyVehicleImage(buf, file.type || 'image/jpeg');
     return NextResponse.json(result);
   } catch (e) {
     return NextResponse.json(
