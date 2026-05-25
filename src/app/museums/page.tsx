@@ -116,7 +116,7 @@ export default function MuseumsPage() {
                       rel="noopener noreferrer"
                       className="flex-shrink-0 text-xs text-zinc-600 transition-colors hover:text-zinc-300"
                     >
-                      &nearr;
+                      ↗
                     </a>
                   )}
                 </div>
