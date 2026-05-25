@@ -60,15 +60,24 @@ for (let i = 0; i < photos.length; i++) {
       continue;
     }
 
-    // Re-generate thumbnail with rotation applied
-    const rotated = sharp(buf).rotate(); // auto-rotate based on EXIF
+    // Re-encode original with rotation baked into pixels (strips EXIF orientation)
+    const rotated = sharp(buf).rotate();
+    const ext = p.storage_path.split('.').pop()?.toLowerCase() || 'jpg';
+    let rotatedOriginal;
+    if (ext === 'png') {
+      rotatedOriginal = await rotated.clone().png().toBuffer();
+    } else {
+      rotatedOriginal = await rotated.clone().jpeg({ quality: 92 }).toBuffer();
+    }
+
+    // Re-generate thumbnail
     const thumbnail = await rotated
       .clone()
       .resize(400, null, { withoutEnlargement: true })
       .webp({ quality: 80 })
       .toBuffer();
 
-    // Re-generate blurhash from rotated image
+    // Re-generate blurhash
     const { data: pixels, info } = await rotated
       .clone()
       .raw()
@@ -77,7 +86,14 @@ for (let i = 0; i < photos.length; i++) {
       .toBuffer({ resolveWithObject: true });
     const blurhash = encode(new Uint8ClampedArray(pixels), info.width, info.height, 4, 4);
 
-    // Re-upload thumbnail
+    // Re-upload both original and thumbnail with rotation baked in
+    await supabase.storage
+      .from('photos')
+      .upload(p.storage_path, rotatedOriginal, {
+        contentType: ext === 'png' ? 'image/png' : 'image/jpeg',
+        upsert: true,
+      });
+
     if (p.thumbnail_path) {
       await supabase.storage
         .from('photos')
