@@ -14,7 +14,16 @@ export async function POST(request: Request) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const form = await request.formData();
+  let form;
+  try {
+    form = await request.formData();
+  } catch (e) {
+    return NextResponse.json(
+      { error: e instanceof Error ? e.message : 'Failed to parse upload' },
+      { status: 400 }
+    );
+  }
+
   const file = form.get('file');
   if (!(file instanceof File)) {
     return NextResponse.json({ error: 'Missing file' }, { status: 400 });

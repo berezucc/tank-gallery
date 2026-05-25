@@ -3,6 +3,33 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDropzone } from 'react-dropzone';
+
+// Resize an image in the browser before uploading. Prevents API route body
+// size failures for large camera JPEGs and speeds up uploads/classification.
+function resizeImage(file: File, maxDim: number, quality: number): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      let { width: w, height: h } = img;
+      if (w > maxDim || h > maxDim) {
+        if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+        else       { w = Math.round(w * maxDim / h); h = maxDim; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d')!.drawImage(img, 0, 0, w, h);
+      canvas.toBlob(
+        (blob) => blob ? resolve(blob) : reject(new Error('Resize failed')),
+        'image/jpeg',
+        quality
+      );
+      URL.revokeObjectURL(img.src);
+    };
+    img.onerror = () => { URL.revokeObjectURL(img.src); reject(new Error('Image load failed')); };
+    img.src = URL.createObjectURL(file);
+  });
+}
 import {
   VEHICLE_TYPES,
   VEHICLE_ERAS,
@@ -261,11 +288,12 @@ async function uploadOne(
   item: PendingItem,
   setItems: React.Dispatch<React.SetStateAction<PendingItem[]>>
 ) {
-  const form = new FormData();
-  form.append('file', item.file);
   try {
+    const blob = await resizeImage(item.file, 3000, 0.92).catch(() => item.file);
+    const form = new FormData();
+    form.append('file', blob, item.file.name);
     const res = await fetch('/api/upload', { method: 'POST', body: form });
-    const body = await res.json();
+    const body = await res.json().catch(() => ({ error: res.statusText }));
     if (!res.ok) throw new Error(body.error ?? res.statusText);
     setItems((prev) => prev.map((it) => (it.id === item.id
       ? { ...it, status: 'ready', upload: body }
@@ -281,8 +309,9 @@ async function classifyOne(
   item: PendingItem,
   setItems: React.Dispatch<React.SetStateAction<PendingItem[]>>
 ) {
+  const blob = await resizeImage(item.file, 1024, 0.8).catch(() => item.file);
   const form = new FormData();
-  form.append('file', item.file);
+  form.append('file', blob, item.file.name);
   try {
     const res = await fetch('/api/classify', { method: 'POST', body: form });
     if (!res.ok) throw new Error('classify failed');
