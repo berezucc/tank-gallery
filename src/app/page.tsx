@@ -93,6 +93,7 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
         <nav className="flex gap-5 text-xs text-zinc-500">
           <Link href="/map"      className="transition-colors hover:text-zinc-100">Map</Link>
           <Link href="/stats"    className="transition-colors hover:text-zinc-100">Stats</Link>
+          <Link href="/museums"  className="transition-colors hover:text-zinc-100">Museums</Link>
           <Link href="/identify" className="transition-colors hover:text-zinc-100">Identify</Link>
         </nav>
       </header>
