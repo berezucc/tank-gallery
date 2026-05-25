@@ -50,8 +50,7 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
       lightboxCards = cards.filter(
         (c) =>
           c.vehicle.id === clicked.vehicle.id &&
-          c.photo.location_taken === clicked.photo.location_taken &&
-          c.photo.date_taken === clicked.photo.date_taken
+          c.photo.location_taken === clicked.photo.location_taken
       );
       lightboxIndex = lightboxCards.findIndex((c) => c.photo.id === flat.photo);
       if (lightboxIndex < 0) lightboxIndex = 0;

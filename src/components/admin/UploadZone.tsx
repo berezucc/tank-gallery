@@ -137,6 +137,15 @@ export function UploadZone() {
   // Persist to localStorage whenever items change (ready/error items only).
   useEffect(() => { persistItems(items); }, [items]);
 
+  // Warn before leaving if there are unsaved uploads.
+  useEffect(() => {
+    const hasUnsaved = items.some((i) => i.status !== 'saved' && (i.status === 'ready' || i.status === 'uploading' || i.status === 'error'));
+    if (!hasUnsaved) return;
+    const onBeforeUnload = (e: BeforeUnloadEvent) => { e.preventDefault(); };
+    window.addEventListener('beforeunload', onBeforeUnload);
+    return () => window.removeEventListener('beforeunload', onBeforeUnload);
+  }, [items]);
+
   const onDrop = useCallback(async (accepted: File[]) => {
     const newItems: PendingItem[] = accepted.map((file) => ({
       id: crypto.randomUUID(),
