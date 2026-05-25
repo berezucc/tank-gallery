@@ -1,12 +1,11 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
-import { getGalleryVehicles } from '@/lib/supabase/queries';
-import { getGalleryTotalCount } from '@/lib/supabase/queries';
+import { getGalleryVehicles, getGalleryTotalCount } from '@/lib/supabase/queries';
 import { FilterBar } from '@/components/gallery/FilterBar';
 import { GalleryGrid } from '@/components/gallery/GalleryGrid';
 import { Lightbox } from '@/components/gallery/Lightbox';
 import { VEHICLE_TYPES, VEHICLE_ERAS } from '@/lib/constants';
-import type { GalleryFilters, VehicleType, VehicleEra, PhotoCard } from '@/types';
+import type { GalleryFilters, VehicleType, VehicleEra, PhotoCard, PhotoGroup } from '@/types';
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -17,6 +16,24 @@ function parseFilters(raw: Record<string, string | undefined>): GalleryFilters {
   if (raw.nation) filters.nation = raw.nation;
   if (raw.q)      filters.q      = raw.q.trim();
   return filters;
+}
+
+function groupPhotos(cards: PhotoCard[]): PhotoGroup[] {
+  const map = new Map<string, PhotoGroup>();
+  for (const c of cards) {
+    const key = `${c.vehicle.id}|${c.photo.location_taken ?? ''}`;
+    const existing = map.get(key);
+    if (existing) {
+      existing.photos.push(c.photo);
+    } else {
+      map.set(key, {
+        vehicle:  c.vehicle,
+        photos:   [c.photo],
+        location: c.photo.location_taken,
+      });
+    }
+  }
+  return Array.from(map.values());
 }
 
 export default async function Home({ searchParams }: { searchParams: SearchParams }) {
@@ -37,26 +54,26 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
     }))
   );
 
-  // Get unfiltered total for "X of Y" display
-  const totalCount = isFiltered ? await getGalleryTotalCount() : cards.length;
+  const groups = groupPhotos(cards);
+  const totalPhotoCount = cards.length;
+  const unfilteredTotal = isFiltered ? await getGalleryTotalCount() : totalPhotoCount;
 
   const nationSet = new Set<string>();
   vehicles.forEach((v) => v.nation && nationSet.add(v.nation));
   if (flat.nation) nationSet.add(flat.nation);
   const availableNations = Array.from(nationSet).sort();
 
+  // Lightbox: find the group containing the clicked photo
   let lightboxCards: PhotoCard[] = [];
   let lightboxIndex = 0;
   if (flat.photo) {
-    const clicked = cards.find((c) => c.photo.id === flat.photo);
-    if (clicked) {
-      lightboxCards = cards.filter(
-        (c) =>
-          c.vehicle.id === clicked.vehicle.id &&
-          c.photo.location_taken === clicked.photo.location_taken
-      );
-      lightboxIndex = lightboxCards.findIndex((c) => c.photo.id === flat.photo);
-      if (lightboxIndex < 0) lightboxIndex = 0;
+    for (const g of groups) {
+      const idx = g.photos.findIndex((p) => p.id === flat.photo);
+      if (idx >= 0) {
+        lightboxCards = g.photos.map((p) => ({ photo: p, vehicle: g.vehicle }));
+        lightboxIndex = idx;
+        break;
+      }
     }
   }
 
@@ -67,8 +84,8 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
           <h1 className="text-lg font-semibold tracking-tight sm:text-xl">Tank Gallery</h1>
           <p className="mt-0.5 text-xs tabular-nums text-zinc-500">
             {isFiltered
-              ? `${cards.length} of ${totalCount} photos`
-              : `${cards.length} photos`}
+              ? `${totalPhotoCount} of ${unfilteredTotal} photos`
+              : `${totalPhotoCount} photos`}
           </p>
         </div>
         <nav className="flex gap-5 text-xs text-zinc-500">
@@ -82,7 +99,7 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
         <FilterBar availableNations={availableNations} />
       </Suspense>
 
-      <GalleryGrid cards={cards} searchParams={flat} />
+      <GalleryGrid groups={groups} searchParams={flat} />
 
       <Lightbox cards={lightboxCards} initialIndex={lightboxIndex} />
     </main>

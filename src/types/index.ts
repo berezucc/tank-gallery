@@ -33,12 +33,17 @@ export interface VehicleWithPhotos extends Vehicle {
   photos: Photo[];
 }
 
-// A photo card in the gallery grid. Each photo gets its own card.
-// Photos with the same vehicle + location + date are grouped into a
-// carousel in the lightbox.
 export interface PhotoCard {
   photo: Photo;
   vehicle: Vehicle;
+}
+
+// A group of photos sharing the same vehicle + location.
+// Grid shows one card per group; lightbox shows the carousel.
+export interface PhotoGroup {
+  vehicle: Vehicle;
+  photos: Photo[];
+  location: string | null;
 }
 
 export interface GalleryFilters {
