@@ -72,23 +72,13 @@ export function FilterBar({ availableNations }: Props) {
     <div className="sticky top-0 z-10 -mx-4 mb-4 bg-[#0a0a0a]/90 px-4 py-3 backdrop-blur-xl sm:-mx-6 sm:px-6">
       <div className="flex flex-wrap items-center gap-2">
         {/* Search */}
-        <div className="relative">
-          <input
-            type="search"
-            placeholder="Search…"
-            value={q}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="h-8 w-44 rounded-full border border-zinc-800 bg-zinc-900/80 pl-3.5 pr-8 text-xs text-zinc-100 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-700"
-          />
-          {q && (
-            <button
-              onClick={() => onSearchChange('')}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
-            >
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 3l6 6M9 3l-6 6"/></svg>
-            </button>
-          )}
-        </div>
+        <input
+          type="search"
+          placeholder="Search…"
+          value={q}
+          onChange={(e) => onSearchChange(e.target.value)}
+          className="h-8 w-44 rounded-full border border-zinc-800 bg-zinc-900/80 px-3.5 text-xs text-zinc-100 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-700"
+        />
 
         <Sep />
 
