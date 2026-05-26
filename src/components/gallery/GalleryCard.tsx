@@ -2,7 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { publicPhotoUrl } from '@/lib/storage';
 import { blurhashToDataUrl } from '@/lib/blurhash';
-import { nationFlag } from '@/lib/constants';
+import { Flag } from '@/components/ui/Flag';
 import type { PhotoGroup } from '@/types';
 
 interface Props {
@@ -23,7 +23,6 @@ export async function GalleryCard({ group, searchParams }: Props) {
 
   const aspect = hero.width && hero.height ? hero.width / hero.height : 4 / 3;
   const blurDataURL = await blurhashToDataUrl(hero.blurhash);
-  const flag = nationFlag(vehicle.nation);
   const count = photos.length;
 
   return (
@@ -43,7 +42,6 @@ export async function GalleryCard({ group, searchParams }: Props) {
         {...(blurDataURL ? { placeholder: 'blur' as const, blurDataURL } : {})}
       />
 
-      {/* Photo count badge */}
       {count > 1 && (
         <div className="absolute right-2 top-2 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[11px] font-medium text-white backdrop-blur-sm">
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -54,11 +52,11 @@ export async function GalleryCard({ group, searchParams }: Props) {
         </div>
       )}
 
-      {/* Overlay — visible on hover */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
       <div className="absolute inset-x-0 bottom-0 translate-y-2 p-3 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-        <p className="text-sm font-medium leading-tight text-white drop-shadow-md">
-          {flag ? `${flag}\u{200a} ` : ''}{vehicle.name}
+        <p className="flex items-center gap-1.5 text-sm font-medium leading-tight text-white drop-shadow-md">
+          <Flag nation={vehicle.nation} />
+          {vehicle.name}
         </p>
         {location && (
           <p className="mt-0.5 text-[11px] text-zinc-300 drop-shadow-md">{location}</p>

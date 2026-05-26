@@ -9,6 +9,7 @@ import {
   VEHICLE_ERA_LABELS,
   nationFlag,
 } from '@/lib/constants';
+import { Flag } from '@/components/ui/Flag';
 
 interface Props {
   availableNations: string[];

@@ -5,7 +5,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { publicPhotoUrl } from '@/lib/storage';
-import { VEHICLE_ERA_LABELS, VEHICLE_TYPE_LABELS, nationFlag } from '@/lib/constants';
+import { VEHICLE_ERA_LABELS, VEHICLE_TYPE_LABELS } from '@/lib/constants';
+import { Flag } from '@/components/ui/Flag';
 import type { PhotoCard } from '@/types';
 
 interface Props {
@@ -108,8 +109,9 @@ export function Lightbox({ cards, initialIndex }: Props) {
             )}
 
             <div className="text-center">
-              <h2 className="text-xl font-semibold text-white">
-                {nationFlag(current.vehicle.nation) ? `${nationFlag(current.vehicle.nation)} ` : ''}{current.vehicle.name}
+              <h2 className="flex items-center justify-center gap-2 text-xl font-semibold text-white">
+                <Flag nation={current.vehicle.nation} />
+                {current.vehicle.name}
               </h2>
               <p className="mt-1 text-sm text-zinc-400">
                 {VEHICLE_TYPE_LABELS[current.vehicle.type]} · {VEHICLE_ERA_LABELS[current.vehicle.era]}
