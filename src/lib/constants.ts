@@ -32,7 +32,7 @@ const NATION_FLAG_MAP: Record<string, string> = {
   'USA':         '\u{1F1FA}\u{1F1F8}',
   'UK':          '\u{1F1EC}\u{1F1E7}',
   'Germany':     '\u{1F1E9}\u{1F1EA}',
-  'USSR/Russia': '\u{1F1F7}\u{1F1FA}',
+  'USSR/Russia': '\u{262D}',
   'Canada':      '\u{1F1E8}\u{1F1E6}',
   'France':      '\u{1F1EB}\u{1F1F7}',
   'Italy':       '\u{1F1EE}\u{1F1F9}',
