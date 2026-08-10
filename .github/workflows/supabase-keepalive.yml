@@ -3,11 +3,21 @@ name: Supabase keep-alive
 # Supabase pauses free-tier projects after 7 days without activity.
 # This hits the REST API on a schedule so the database never goes idle
 # long enough to be suspended.
+#
+# GitHub also disables scheduled workflows in public repos after 60 days
+# with no repository activity, which would silently kill the ping above.
+# The `refresh` job below commits once a month to reset that clock.
 
 on:
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: '0 */6 * * *'    # the ping
+    - cron: '0 3 1 * *'      # monthly repo-activity refresh
   workflow_dispatch:
+    inputs:
+      refresh:
+        description: 'Also run the monthly repo-activity refresh'
+        type: boolean
+        default: false
 
 jobs:
   ping:
@@ -21,3 +31,20 @@ jobs:
           test "$code" = "200"
         env:
           PING_URL: ${{ secrets.SUPABASE_PING_URL }}
+
+  refresh:
+    # Only on the monthly cron, or when manually requested.
+    if: github.event.schedule == '0 3 1 * *' || inputs.refresh
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Commit to reset the 60-day inactivity clock
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          date -u > .github/last-keepalive
+          git add .github/last-keepalive
+          git commit -m "chore: keep-alive [skip ci]" || exit 0
+          git push
