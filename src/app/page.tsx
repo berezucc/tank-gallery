@@ -3,9 +3,9 @@ import Link from 'next/link';
 import { getGalleryVehicles, getGalleryTotalCount } from '@/lib/supabase/queries';
 import { FilterBar } from '@/components/gallery/FilterBar';
 import { GalleryGrid } from '@/components/gallery/GalleryGrid';
-import { Lightbox } from '@/components/gallery/Lightbox';
+import { LightboxProvider } from '@/components/gallery/LightboxProvider';
 import { VEHICLE_TYPES, VEHICLE_ERAS } from '@/lib/constants';
-import type { GalleryFilters, VehicleType, VehicleEra, PhotoCard, PhotoGroup } from '@/types';
+import type { GalleryFilters, VehicleType, VehicleEra, PhotoCard, PhotoGroup, LightboxEntry } from '@/types';
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -65,15 +65,25 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
   if (flat.nation) nationSet.add(flat.nation);
   const availableNations = Array.from(nationSet).sort();
 
-  // Lightbox: find the group containing the clicked photo
-  let lightboxCards: PhotoCard[] = [];
-  let lightboxIndex = 0;
+  // Only used for a ?photo=<id> deep link on first load. Ordinary clicks open
+  // the lightbox from client state and never re-render this page.
+  let initialEntry: LightboxEntry | null = null;
+  let initialIndex = 0;
   if (flat.photo) {
     for (const g of groups) {
       const idx = g.photos.findIndex((p) => p.id === flat.photo);
       if (idx >= 0) {
-        lightboxCards = g.photos.map((p) => ({ photo: p, vehicle: g.vehicle }));
-        lightboxIndex = idx;
+        initialEntry = {
+          vehicle: { name: g.vehicle.name, type: g.vehicle.type, era: g.vehicle.era, nation: g.vehicle.nation },
+          photos: g.photos.map((p) => ({
+            id: p.id,
+            storage_path: p.storage_path,
+            width: p.width,
+            height: p.height,
+            location_taken: p.location_taken,
+          })),
+        };
+        initialIndex = idx;
         break;
       }
     }
@@ -102,9 +112,9 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
         <FilterBar availableNations={availableNations} />
       </Suspense>
 
-      <GalleryGrid groups={groups} searchParams={flat} />
-
-      <Lightbox cards={lightboxCards} initialIndex={lightboxIndex} />
+      <LightboxProvider initialEntry={initialEntry} initialIndex={initialIndex}>
+        <GalleryGrid groups={groups} />
+      </LightboxProvider>
     </main>
   );
 }

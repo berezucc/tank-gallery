@@ -2,60 +2,56 @@
 
 import Image from 'next/image';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { publicPhotoUrl } from '@/lib/storage';
 import { VEHICLE_ERA_LABELS, VEHICLE_TYPE_LABELS } from '@/lib/constants';
 import { Flag } from '@/components/ui/Flag';
-import type { PhotoCard } from '@/types';
+import type { LightboxEntry } from '@/types';
 
 interface Props {
-  cards: PhotoCard[];
-  initialIndex: number;
+  entry: LightboxEntry | null;
+  index: number;
+  onClose: () => void;
+  onGoTo: (index: number) => void;
 }
 
-export function Lightbox({ cards, initialIndex }: Props) {
-  const router   = useRouter();
-  const pathname = usePathname();
-  const params   = useSearchParams();
-  const [index, setIndex] = useState(initialIndex);
-
-  const isOpen = cards.length > 0;
-  const current = cards[index] ?? null;
-
-  const close = useCallback(() => {
-    const next = new URLSearchParams(params.toString());
-    next.delete('photo');
-    const qs = next.toString();
-    router.push(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-  }, [params, pathname, router]);
-
-  useEffect(() => { setIndex(initialIndex); }, [initialIndex]);
+export function Lightbox({ entry, index, onClose, onGoTo }: Props) {
+  const isOpen = Boolean(entry && entry.photos.length > 0);
+  const photo = entry?.photos[index] ?? null;
+  const count = entry?.photos.length ?? 0;
 
   useEffect(() => {
     if (!isOpen) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape')     close();
-      if (e.key === 'ArrowRight') setIndex((i) => Math.min(i + 1, cards.length - 1));
-      if (e.key === 'ArrowLeft')  setIndex((i) => Math.max(i - 1, 0));
+      if (e.key === 'Escape')     onClose();
+      if (e.key === 'ArrowRight') onGoTo(Math.min(index + 1, count - 1));
+      if (e.key === 'ArrowLeft')  onGoTo(Math.max(index - 1, 0));
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [isOpen, cards.length, close]);
+  }, [isOpen, index, count, onClose, onGoTo]);
+
+  // Stop the page behind the overlay from scrolling while it's open.
+  useEffect(() => {
+    if (!isOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, [isOpen]);
 
   return (
     <AnimatePresence>
-      {isOpen && current && (
+      {isOpen && entry && photo && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4 sm:p-8"
-          onClick={close}
+          onClick={onClose}
         >
           <button
-            onClick={(e) => { e.stopPropagation(); close(); }}
+            onClick={(e) => { e.stopPropagation(); onClose(); }}
             aria-label="Close"
             className="absolute right-4 top-4 z-10 rounded-full bg-zinc-900/80 p-2 text-zinc-300 hover:text-white"
           >
@@ -65,7 +61,7 @@ export function Lightbox({ cards, initialIndex }: Props) {
           </button>
 
           <motion.div
-            key={current.photo.id}
+            key={photo.id}
             initial={{ scale: 0.96, opacity: 0 }}
             animate={{ scale: 1,    opacity: 1 }}
             exit={{    scale: 0.96, opacity: 0 }}
@@ -75,19 +71,19 @@ export function Lightbox({ cards, initialIndex }: Props) {
           >
             <div className="relative flex max-h-[75vh] w-full flex-1 items-center justify-center">
               <Image
-                src={publicPhotoUrl(current.photo.storage_path)}
-                alt={current.vehicle.name}
-                width={current.photo.width  ?? 1600}
-                height={current.photo.height ?? 1200}
+                src={publicPhotoUrl(photo.storage_path)}
+                alt={entry.vehicle.name}
+                width={photo.width  ?? 1600}
+                height={photo.height ?? 1200}
                 className="max-h-[75vh] w-auto object-contain"
                 priority
               />
             </div>
 
-            {cards.length > 1 && (
+            {count > 1 && (
               <div className="flex items-center gap-3">
                 <button
-                  onClick={() => setIndex((i) => Math.max(i - 1, 0))}
+                  onClick={() => onGoTo(Math.max(index - 1, 0))}
                   disabled={index === 0}
                   className="rounded-full bg-zinc-900 px-3 py-1 text-sm text-zinc-300 disabled:opacity-30 hover:bg-zinc-800"
                   aria-label="Previous photo"
@@ -95,11 +91,11 @@ export function Lightbox({ cards, initialIndex }: Props) {
                   ←
                 </button>
                 <span className="text-xs text-zinc-500">
-                  {index + 1} / {cards.length}
+                  {index + 1} / {count}
                 </span>
                 <button
-                  onClick={() => setIndex((i) => Math.min(i + 1, cards.length - 1))}
-                  disabled={index === cards.length - 1}
+                  onClick={() => onGoTo(Math.min(index + 1, count - 1))}
+                  disabled={index === count - 1}
                   className="rounded-full bg-zinc-900 px-3 py-1 text-sm text-zinc-300 disabled:opacity-30 hover:bg-zinc-800"
                   aria-label="Next photo"
                 >
@@ -110,15 +106,15 @@ export function Lightbox({ cards, initialIndex }: Props) {
 
             <div className="text-center">
               <h2 className="flex items-center justify-center gap-2 text-xl font-semibold text-white">
-                <Flag nation={current.vehicle.nation} />
-                {current.vehicle.name}
+                <Flag nation={entry.vehicle.nation} />
+                {entry.vehicle.name}
               </h2>
               <p className="mt-1 text-sm text-zinc-400">
-                {VEHICLE_TYPE_LABELS[current.vehicle.type]} · {VEHICLE_ERA_LABELS[current.vehicle.era]}
-                {current.vehicle.nation ? ` · ${current.vehicle.nation}` : ''}
+                {VEHICLE_TYPE_LABELS[entry.vehicle.type]} · {VEHICLE_ERA_LABELS[entry.vehicle.era]}
+                {entry.vehicle.nation ? ` · ${entry.vehicle.nation}` : ''}
               </p>
-              {current.photo.location_taken && (
-                <p className="mt-1 text-xs text-zinc-500">{current.photo.location_taken}</p>
+              {photo.location_taken && (
+                <p className="mt-1 text-xs text-zinc-500">{photo.location_taken}</p>
               )}
             </div>
           </motion.div>

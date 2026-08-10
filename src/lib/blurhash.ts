@@ -1,9 +1,12 @@
 import { decode } from 'blurhash';
 import sharp from 'sharp';
 
-const SIZE = 32;
+// 16px is plenty: the placeholder is scaled up and blurred anyway, and every
+// byte here ships inline in the HTML once per card. At 32px PNG these
+// placeholders were 2.0 MB of a 3.7 MB page.
+const SIZE = 16;
 
-// Decode a blurhash string into a tiny base64-encoded PNG data URL,
+// Decode a blurhash string into a tiny base64-encoded WebP data URL,
 // suitable for next/image's blurDataURL prop. Cached at module level
 // since blurhashes are stable per photo.
 const cache = new Map<string, string>();
@@ -18,9 +21,9 @@ export async function blurhashToDataUrl(hash: string | null): Promise<string | u
     const buf = await sharp(Buffer.from(pixels), {
       raw: { width: SIZE, height: SIZE, channels: 4 },
     })
-      .png()
+      .webp({ quality: 40 })
       .toBuffer();
-    const dataUrl = `data:image/png;base64,${buf.toString('base64')}`;
+    const dataUrl = `data:image/webp;base64,${buf.toString('base64')}`;
     cache.set(hash, dataUrl);
     return dataUrl;
   } catch {

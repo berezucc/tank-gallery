@@ -1,36 +1,40 @@
 import Image from 'next/image';
-import Link from 'next/link';
 import { publicPhotoUrl } from '@/lib/storage';
 import { blurhashToDataUrl } from '@/lib/blurhash';
 import { Flag } from '@/components/ui/Flag';
-import type { PhotoGroup } from '@/types';
+import { CardButton } from './CardButton';
+import type { LightboxEntry, PhotoGroup } from '@/types';
 
 interface Props {
   group: PhotoGroup;
-  searchParams: Record<string, string | undefined>;
 }
 
-export async function GalleryCard({ group, searchParams }: Props) {
+export async function GalleryCard({ group }: Props) {
   const { vehicle, photos, location } = group;
   const hero = photos[0];
   if (!hero) return null;
-
-  const params = new URLSearchParams();
-  for (const [k, v] of Object.entries(searchParams)) {
-    if (v) params.set(k, v);
-  }
-  params.set('photo', hero.id);
 
   const aspect = hero.width && hero.height ? hero.width / hero.height : 4 / 3;
   const blurDataURL = await blurhashToDataUrl(hero.blurhash);
   const count = photos.length;
 
+  // Only the fields the lightbox renders — this is serialised to the client.
+  const entry: LightboxEntry = {
+    vehicle: { name: vehicle.name, type: vehicle.type, era: vehicle.era, nation: vehicle.nation },
+    photos: photos.map((p) => ({
+      id: p.id,
+      storage_path: p.storage_path,
+      width: p.width,
+      height: p.height,
+      location_taken: p.location_taken,
+    })),
+  };
+
   return (
-    <Link
-      href={`/?${params.toString()}`}
-      scroll={false}
-      prefetch={false}
-      className="group relative block overflow-hidden bg-zinc-900"
+    <CardButton
+      entry={entry}
+      label={vehicle.name}
+      className="group relative block w-full overflow-hidden bg-zinc-900 text-left"
       style={{ aspectRatio: aspect }}
     >
       <Image
@@ -62,6 +66,6 @@ export async function GalleryCard({ group, searchParams }: Props) {
           <p className="mt-0.5 text-[11px] text-zinc-300 drop-shadow-md">{location}</p>
         )}
       </div>
-    </Link>
+    </CardButton>
   );
 }

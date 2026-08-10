@@ -38,6 +38,29 @@ export interface PhotoCard {
   vehicle: Vehicle;
 }
 
+// Trimmed shapes for the lightbox. Every card serialises one of these into the
+// client payload, so they carry only fields the lightbox actually renders —
+// no blurhash, ai_raw_response, vehicle_id or created_at.
+export interface LightboxPhoto {
+  id: string;
+  storage_path: string;
+  width: number | null;
+  height: number | null;
+  location_taken: string | null;
+}
+
+export interface LightboxVehicle {
+  name: string;
+  type: VehicleType;
+  era: VehicleEra;
+  nation: string | null;
+}
+
+export interface LightboxEntry {
+  vehicle: LightboxVehicle;
+  photos: LightboxPhoto[];
+}
+
 // A group of photos sharing the same vehicle + location.
 // Grid shows one card per group; lightbox shows the carousel.
 export interface PhotoGroup {
