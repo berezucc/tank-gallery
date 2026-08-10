@@ -1,10 +1,12 @@
-export const VEHICLE_TYPES = ['tank', 'aircraft', 'artillery', 'vehicle', 'other'] as const;
+export const VEHICLE_TYPES = ['tank', 'aircraft', 'artillery', 'ship', 'submarine', 'vehicle', 'other'] as const;
 export const VEHICLE_ERAS  = ['ww1', 'ww2', 'cold_war', 'modern', 'other'] as const;
 
 export const VEHICLE_TYPE_LABELS: Record<(typeof VEHICLE_TYPES)[number], string> = {
   tank:      'Tanks',
   aircraft:  'Aircraft',
   artillery: 'Artillery',
+  ship:      'Ships',
+  submarine: 'Submarines',
   vehicle:   'Vehicles',
   other:     'Other',
 };
