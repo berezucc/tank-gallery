@@ -22,6 +22,8 @@ export interface Photo {
   height: number | null;
   location_taken: string | null;
   date_taken: string | null;
+  lat: number | null;
+  lng: number | null;
   sort_order: number;
   ai_raw_response: unknown;
   created_at: string;
@@ -59,6 +61,30 @@ export interface LightboxVehicle {
 export interface LightboxEntry {
   vehicle: LightboxVehicle;
   photos: LightboxPhoto[];
+}
+
+export const GALLERY_VIEWS = ['grid', 'map', 'timeline'] as const;
+export type GalleryView = (typeof GALLERY_VIEWS)[number];
+
+export interface TimelinePhoto {
+  id: string;
+  storage_path: string;
+  thumbnail_path: string | null;
+  width: number | null;
+  height: number | null;
+  vehicle_name: string;
+  vehicle_type: VehicleType;
+  vehicle_era: VehicleEra;
+  vehicle_nation: string | null;
+}
+
+// Photos clustered by location + month — one trip to one museum.
+export interface TimelineVisit {
+  key: string;
+  location: string | null;
+  dateLabel: string;
+  sortKey: number;
+  photos: TimelinePhoto[];
 }
 
 // A group of photos sharing the same vehicle + location.

@@ -3,9 +3,15 @@ import Link from 'next/link';
 import { getGalleryVehicles, getGalleryTotalCount } from '@/lib/supabase/queries';
 import { FilterBar } from '@/components/gallery/FilterBar';
 import { GalleryGrid } from '@/components/gallery/GalleryGrid';
+import { GalleryViews } from '@/components/gallery/GalleryViews';
 import { LightboxProvider } from '@/components/gallery/LightboxProvider';
-import { VEHICLE_TYPES, VEHICLE_ERAS } from '@/lib/constants';
-import type { GalleryFilters, VehicleType, VehicleEra, PhotoCard, PhotoGroup, LightboxEntry } from '@/types';
+import { VEHICLE_TYPES, VEHICLE_ERAS, } from '@/lib/constants';
+import { GALLERY_VIEWS } from '@/types';
+import type {
+  GalleryFilters, VehicleType, VehicleEra, PhotoCard, PhotoGroup,
+  LightboxEntry, GalleryView, TimelineVisit,
+} from '@/types';
+import type { MapPhoto } from '@/lib/supabase/queries';
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -16,6 +22,61 @@ function parseFilters(raw: Record<string, string | undefined>): GalleryFilters {
   if (raw.nation) filters.nation = raw.nation;
   if (raw.q)      filters.q      = raw.q.trim();
   return filters;
+}
+
+const MONTH_FMT = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+
+// Cluster photos into "visits": one location, one month. This is what turns a
+// flat wall of photos into a sequence of trips.
+function buildVisits(cards: PhotoCard[]): TimelineVisit[] {
+  const map = new Map<string, TimelineVisit>();
+
+  for (const { photo, vehicle } of cards) {
+    const month = photo.date_taken ? photo.date_taken.slice(0, 7) : '';
+    const key = `${photo.location_taken ?? ''}|${month}`;
+    let visit = map.get(key);
+
+    if (!visit) {
+      visit = {
+        key,
+        location: photo.location_taken,
+        dateLabel: month ? MONTH_FMT.format(new Date(`${month}-01T00:00:00Z`)) : 'Date unknown',
+        // Undated visits sort last rather than to 1970.
+        sortKey: month ? Date.parse(`${month}-01T00:00:00Z`) : -Infinity,
+        photos: [],
+      };
+      map.set(key, visit);
+    }
+
+    visit.photos.push({
+      id: photo.id,
+      storage_path: photo.storage_path,
+      thumbnail_path: photo.thumbnail_path,
+      width: photo.width,
+      height: photo.height,
+      vehicle_name: vehicle.name,
+      vehicle_type: vehicle.type,
+      vehicle_era: vehicle.era,
+      vehicle_nation: vehicle.nation,
+    });
+  }
+
+  return Array.from(map.values()).sort((a, b) => b.sortKey - a.sortKey);
+}
+
+function buildMapPhotos(cards: PhotoCard[]): MapPhoto[] {
+  return cards
+    .filter((c) => c.photo.lat != null && c.photo.lng != null)
+    .map(({ photo, vehicle }) => ({
+      id: photo.id,
+      vehicle_id: vehicle.id,
+      vehicle_name: vehicle.name,
+      storage_path: photo.storage_path,
+      thumbnail_path: photo.thumbnail_path,
+      location_taken: photo.location_taken,
+      lat: photo.lat as number,
+      lng: photo.lng as number,
+    }));
 }
 
 function groupPhotos(cards: PhotoCard[]): PhotoGroup[] {
@@ -44,6 +105,11 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
   for (const [k, v] of Object.entries(raw)) {
     flat[k] = Array.isArray(v) ? v[0] : v;
   }
+
+  const initialView: GalleryView =
+    (GALLERY_VIEWS as readonly string[]).includes(flat.view ?? '')
+      ? (flat.view as GalleryView)
+      : 'grid';
 
   const filters  = parseFilters(flat);
   const vehicles = await getGalleryVehicles(filters);
@@ -113,7 +179,12 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
       </Suspense>
 
       <LightboxProvider initialEntry={initialEntry} initialIndex={initialIndex}>
-        <GalleryGrid groups={groups} />
+        <GalleryViews
+          initialView={initialView}
+          grid={<GalleryGrid groups={groups} />}
+          mapPhotos={buildMapPhotos(cards)}
+          visits={buildVisits(cards)}
+        />
       </LightboxProvider>
     </main>
   );
