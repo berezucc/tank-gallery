@@ -14,7 +14,6 @@ export async function GalleryCard({ group }: Props) {
   const hero = photos[0];
   if (!hero) return null;
 
-  const aspect = hero.width && hero.height ? hero.width / hero.height : 4 / 3;
   const blurDataURL = await blurhashToDataUrl(hero.blurhash);
   const count = photos.length;
 
@@ -34,8 +33,8 @@ export async function GalleryCard({ group }: Props) {
     <CardButton
       entry={entry}
       label={vehicle.name}
-      className="group relative block w-full overflow-hidden bg-zinc-900 text-left"
-      style={{ aspectRatio: aspect }}
+      // Sizing comes from the justified-row wrapper in GalleryGrid.
+      className="group relative block h-full w-full overflow-hidden bg-zinc-900 text-left"
     >
       <Image
         src={publicPhotoUrl(hero.thumbnail_path ?? hero.storage_path)}

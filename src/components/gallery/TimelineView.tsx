@@ -64,7 +64,10 @@ export function TimelineView({ visits }: Props) {
                   <button
                     key={p.id}
                     type="button"
-                    onClick={() => open(entry, i)}
+                    onClick={(e) => {
+                      const r = e.currentTarget.getBoundingClientRect();
+                      open(entry, i, { x: r.x, y: r.y, width: r.width, height: r.height });
+                    }}
                     aria-label={`Open ${p.vehicle_name}`}
                     className="group relative overflow-hidden bg-zinc-900"
                     style={{ height: ROW_H, width: ROW_H * ratio }}

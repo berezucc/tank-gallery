@@ -1,4 +1,5 @@
 import { createClient } from './server';
+import { VEHICLE_ERA_LABELS, VEHICLE_TYPE_LABELS } from '@/lib/constants';
 import type { GalleryFilters, Photo, VehicleWithPhotos } from '@/types';
 
 // Fetch vehicles + their photos, applying filters. Each vehicle's photos are
@@ -16,16 +17,11 @@ export async function getGalleryVehicles(
   if (filters.era)    query = query.eq('era', filters.era);
   if (filters.type)   query = query.eq('type', filters.type);
   if (filters.nation) query = query.eq('nation', filters.nation);
-  if (filters.q) {
-    // Escape % and _ then wrap with wildcards for a simple substring match.
-    const escaped = filters.q.replace(/[%_]/g, (c) => `\\${c}`);
-    query = query.ilike('name', `%${escaped}%`);
-  }
 
   const { data, error } = await query;
   if (error) throw error;
 
-  return (data ?? []).map((row) => ({
+  const vehicles = (data ?? []).map((row) => ({
     id:         row.id,
     name:       row.name,
     type:       row.type,
@@ -34,6 +30,26 @@ export async function getGalleryVehicles(
     created_at: row.created_at,
     photos:     ((row.photos as Photo[]) ?? []).sort((a, b) => a.sort_order - b.sort_order),
   }));
+
+  // Free-text search runs in JS rather than as an ilike on `name`, so a query
+  // can match the museum a photo was taken at ("Camden", "Seaport") or the
+  // nation and category labels — not just the vehicle's own name. The dataset
+  // is a few hundred rows and already fully fetched, so this costs nothing.
+  if (!filters.q) return vehicles;
+
+  const needle = filters.q.trim().toLowerCase();
+  if (!needle) return vehicles;
+
+  return vehicles.filter((v) => {
+    const haystack = [
+      v.name,
+      v.nation ?? '',
+      VEHICLE_TYPE_LABELS[v.type as keyof typeof VEHICLE_TYPE_LABELS] ?? v.type,
+      VEHICLE_ERA_LABELS[v.era as keyof typeof VEHICLE_ERA_LABELS] ?? v.era,
+      ...v.photos.map((p) => p.location_taken ?? ''),
+    ];
+    return haystack.some((field) => field.toLowerCase().includes(needle));
+  });
 }
 
 // Total photo count (unfiltered), for "X of Y" display when filters are active.

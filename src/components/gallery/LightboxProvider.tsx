@@ -2,10 +2,10 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { Lightbox } from './Lightbox';
-import type { LightboxEntry } from '@/types';
+import type { LightboxEntry, OriginRect } from '@/types';
 
 interface LightboxApi {
-  open: (entry: LightboxEntry, index: number) => void;
+  open: (entry: LightboxEntry, index: number, origin?: OriginRect) => void;
 }
 
 const Ctx = createContext<LightboxApi | null>(null);
@@ -38,8 +38,10 @@ interface Props {
 export function LightboxProvider({ children, initialEntry, initialIndex }: Props) {
   const [entry, setEntry] = useState<LightboxEntry | null>(initialEntry);
   const [index, setIndex] = useState(initialIndex);
+  const [origin, setOrigin] = useState<OriginRect | null>(null);
 
-  const open = useCallback((next: LightboxEntry, i: number) => {
+  const open = useCallback((next: LightboxEntry, i: number, from?: OriginRect) => {
+    setOrigin(from ?? null);
     setEntry(next);
     setIndex(i);
     syncUrl(next.photos[i]?.id ?? null, 'push');
@@ -47,6 +49,7 @@ export function LightboxProvider({ children, initialEntry, initialIndex }: Props
 
   const close = useCallback(() => {
     setEntry(null);
+    setOrigin(null);
     syncUrl(null, 'replace');
   }, []);
 
@@ -75,7 +78,7 @@ export function LightboxProvider({ children, initialEntry, initialIndex }: Props
   return (
     <Ctx.Provider value={api}>
       {children}
-      <Lightbox entry={entry} index={index} onClose={close} onGoTo={goTo} />
+      <Lightbox entry={entry} index={index} origin={origin} onClose={close} onGoTo={goTo} />
     </Ctx.Provider>
   );
 }

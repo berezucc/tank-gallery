@@ -62,7 +62,6 @@ export default async function OpengraphImage() {
         {urls.length > 0 && (
           <div style={{ display: 'flex', flexWrap: 'wrap', width: '46%', height: '100%' }}>
             {urls.slice(0, 4).map((u) => (
-              // eslint-disable-next-line @next/next/no-img-element
               <img
                 key={u}
                 src={u}

@@ -63,6 +63,14 @@ export interface LightboxEntry {
   photos: LightboxPhoto[];
 }
 
+/** Viewport rect of the thumbnail that was clicked, so the lightbox can grow out of it. */
+export interface OriginRect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 export const GALLERY_VIEWS = ['grid', 'map', 'timeline'] as const;
 export type GalleryView = (typeof GALLERY_VIEWS)[number];
 

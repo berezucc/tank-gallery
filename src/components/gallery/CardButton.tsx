@@ -20,7 +20,10 @@ export function CardButton({ entry, label, className, style, children }: Props) 
   return (
     <button
       type="button"
-      onClick={() => open(entry, 0)}
+      onClick={(e) => {
+        const r = e.currentTarget.getBoundingClientRect();
+        open(entry, 0, { x: r.x, y: r.y, width: r.width, height: r.height });
+      }}
       aria-label={`Open ${label}`}
       className={className}
       style={style}
