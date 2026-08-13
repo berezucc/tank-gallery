@@ -2,7 +2,12 @@
 
 import Image from 'next/image';
 import { AnimatePresence, motion } from 'framer-motion';
+import type { PanInfo } from 'framer-motion';
 import { useEffect } from 'react';
+
+// Swipe thresholds: distance in px, or offset×velocity for a quick flick.
+const SWIPE_DISTANCE = 70;
+const SWIPE_POWER = 500;
 import { publicPhotoUrl } from '@/lib/storage';
 import { VEHICLE_ERA_LABELS, VEHICLE_TYPE_LABELS } from '@/lib/constants';
 import { Flag } from '@/components/ui/Flag';
@@ -19,6 +24,16 @@ export function Lightbox({ entry, index, onClose, onGoTo }: Props) {
   const isOpen = Boolean(entry && entry.photos.length > 0);
   const photo = entry?.photos[index] ?? null;
   const count = entry?.photos.length ?? 0;
+
+  const go = (delta: number) => onGoTo(Math.min(Math.max(index + delta, 0), count - 1));
+
+  // A drag that ends past either threshold advances. Multiplying offset by
+  // velocity means a short flick counts as much as a slow long drag.
+  const onDragEnd = (_: unknown, info: PanInfo) => {
+    const power = info.offset.x * info.velocity.x;
+    if (info.offset.x < -SWIPE_DISTANCE || power < -SWIPE_POWER)     go(1);
+    else if (info.offset.x > SWIPE_DISTANCE || power > SWIPE_POWER)  go(-1);
+  };
 
   useEffect(() => {
     if (!isOpen) return;
@@ -69,16 +84,24 @@ export function Lightbox({ entry, index, onClose, onGoTo }: Props) {
             className="relative flex h-full w-full max-w-6xl flex-col items-center justify-center gap-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="relative flex max-h-[75vh] w-full flex-1 items-center justify-center">
+            <motion.div
+              className="relative flex max-h-[75vh] w-full flex-1 cursor-grab items-center justify-center active:cursor-grabbing"
+              drag={count > 1 ? 'x' : false}
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.18}
+              dragMomentum={false}
+              onDragEnd={onDragEnd}
+            >
               <Image
                 src={publicPhotoUrl(photo.storage_path)}
                 alt={entry.vehicle.name}
                 width={photo.width  ?? 1600}
                 height={photo.height ?? 1200}
-                className="max-h-[75vh] w-auto object-contain"
+                className="pointer-events-none max-h-[75vh] w-auto select-none object-contain"
+                draggable={false}
                 priority
               />
-            </div>
+            </motion.div>
 
             {count > 1 && (
               <div className="flex items-center gap-3">
