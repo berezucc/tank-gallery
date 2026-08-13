@@ -7,24 +7,27 @@ const geist = Geist({
   subsets: ['latin'],
 });
 
+// The wordmark on the page is just "Archive". Tabs and search results get the
+// longer form, since one generic word is unfindable and indistinguishable there.
+const TITLE = 'Archive — military hardware, in person';
 const DESCRIPTION =
-  'Personal gallery of tanks, aircraft, artillery, and military vehicles photographed at museums and sites around the world.';
+  'Photos of tanks, ships, submarines, aircraft and artillery, taken where they sit.';
 
 export const metadata: Metadata = {
   title: {
-    default:  'Tank Gallery',
-    template: '%s | Tank Gallery',
+    default:  TITLE,
+    template: '%s | Archive',
   },
   description: DESCRIPTION,
   openGraph: {
-    title:       'Tank Gallery',
+    title:       TITLE,
     description: DESCRIPTION,
     type:        'website',
-    siteName:    'Tank Gallery',
+    siteName:    'Archive',
   },
   twitter: {
     card:        'summary_large_image',
-    title:       'Tank Gallery',
+    title:       TITLE,
     description: DESCRIPTION,
   },
   robots: { index: true, follow: true },

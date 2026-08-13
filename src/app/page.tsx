@@ -160,7 +160,7 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
     <main className="mx-auto max-w-[1800px] px-4 pb-12 pt-5 sm:px-6">
       <header className="mb-4 flex items-end justify-between">
         <div>
-          <h1 className="text-lg font-semibold tracking-tight sm:text-xl">Tank Gallery</h1>
+          <h1 className="text-lg font-semibold tracking-tight sm:text-xl">Archive</h1>
           <p className="mt-0.5 text-xs tabular-nums text-zinc-500">
             {isFiltered
               ? `${totalPhotoCount} of ${unfilteredTotal} photos`
