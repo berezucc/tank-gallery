@@ -4,6 +4,7 @@ import { getGalleryVehicles, getGalleryTotalCount } from '@/lib/supabase/queries
 import { FilterBar } from '@/components/gallery/FilterBar';
 import { GalleryGrid } from '@/components/gallery/GalleryGrid';
 import { GalleryViews } from '@/components/gallery/GalleryViews';
+import { ViewProvider } from '@/components/gallery/ViewProvider';
 import { LightboxProvider } from '@/components/gallery/LightboxProvider';
 import { VEHICLE_TYPES, VEHICLE_ERAS, } from '@/lib/constants';
 import { GALLERY_VIEWS } from '@/types';
@@ -167,25 +168,28 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
           </p>
         </div>
         <nav className="flex gap-5 text-xs text-zinc-500">
-          <Link href="/map"      className="transition-colors hover:text-zinc-100">Map</Link>
+          {/* Map lives in the view switcher now, so it's dropped from the nav. */}
           <Link href="/stats"    className="transition-colors hover:text-zinc-100">Stats</Link>
           <Link href="/museums"  className="transition-colors hover:text-zinc-100">Museums</Link>
           <Link href="/identify" className="transition-colors hover:text-zinc-100">Identify</Link>
         </nav>
       </header>
 
-      <Suspense fallback={null}>
-        <FilterBar availableNations={availableNations} />
-      </Suspense>
+      {/* ViewProvider wraps both, so the switcher can live inside the toolbar
+          while the content below reads the same view state. */}
+      <ViewProvider initialView={initialView}>
+        <Suspense fallback={null}>
+          <FilterBar availableNations={availableNations} />
+        </Suspense>
 
-      <LightboxProvider initialEntry={initialEntry} initialIndex={initialIndex}>
-        <GalleryViews
-          initialView={initialView}
-          grid={<GalleryGrid groups={groups} />}
-          mapPhotos={buildMapPhotos(cards)}
-          visits={buildVisits(cards)}
-        />
-      </LightboxProvider>
+        <LightboxProvider initialEntry={initialEntry} initialIndex={initialIndex}>
+          <GalleryViews
+            grid={<GalleryGrid groups={groups} />}
+            mapPhotos={buildMapPhotos(cards)}
+            visits={buildVisits(cards)}
+          />
+        </LightboxProvider>
+      </ViewProvider>
     </main>
   );
 }

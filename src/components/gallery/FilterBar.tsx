@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import {
   VEHICLE_TYPES,
   VEHICLE_ERAS,
@@ -9,7 +9,8 @@ import {
   VEHICLE_ERA_LABELS,
   nationFlag,
 } from '@/lib/constants';
-import { Flag } from '@/components/ui/Flag';
+import { FilterMenu } from './FilterMenu';
+import { ViewSwitcher } from './ViewProvider';
 
 interface Props {
   availableNations: string[];
@@ -24,12 +25,18 @@ export function FilterBar({ availableNations }: Props) {
   const activeType   = params.get('type')   ?? '';
   const activeNation = params.get('nation') ?? '';
   const activeQ      = params.get('q')      ?? '';
-  const anyActive    = Boolean(activeEra || activeType || activeNation || activeQ);
 
   const [q, setQ] = useState(activeQ);
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Sync the input when the URL changes underneath us (back button, Clear all)
+  // by comparing against the last seen value during render. An effect that
+  // called setQ would trigger a cascading re-render.
+  const [lastQ, setLastQ] = useState(activeQ);
+  if (activeQ !== lastQ) {
+    setLastQ(activeQ);
+    setQ(activeQ);
+  }
 
-  useEffect(() => { setQ(activeQ); }, [activeQ]);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const pushParams = useCallback(
     (mutate: (p: URLSearchParams) => void) => {
@@ -42,11 +49,11 @@ export function FilterBar({ availableNations }: Props) {
     [params, pathname, router]
   );
 
-  const toggle = useCallback(
+  const setParam = useCallback(
     (key: string, value: string) => {
       pushParams((p) => {
-        if (p.get(key) === value) p.delete(key);
-        else                      p.set(key, value);
+        if (value) p.set(key, value);
+        else       p.delete(key);
       });
     },
     [pushParams]
@@ -66,93 +73,96 @@ export function FilterBar({ availableNations }: Props) {
 
   const clearAll = () => {
     setQ('');
-    router.push(pathname, { scroll: false });
+    // Preserve the current view so clearing filters doesn't kick you to Grid.
+    const view = params.get('view');
+    router.push(view ? `${pathname}?view=${view}` : pathname, { scroll: false });
   };
 
+  const chips = [
+    activeQ      && { key: 'q',      label: `“${activeQ}”` },
+    activeEra    && { key: 'era',    label: VEHICLE_ERA_LABELS[activeEra as keyof typeof VEHICLE_ERA_LABELS] ?? activeEra },
+    activeType   && { key: 'type',   label: VEHICLE_TYPE_LABELS[activeType as keyof typeof VEHICLE_TYPE_LABELS] ?? activeType },
+    activeNation && { key: 'nation', label: `${nationFlag(activeNation)} ${activeNation}`.trim() },
+  ].filter(Boolean) as { key: string; label: string }[];
+
   return (
-    <div className="sticky top-0 z-10 -mx-4 mb-4 bg-[#0a0a0a]/90 px-4 py-3 backdrop-blur-xl sm:-mx-6 sm:px-6">
-      <div className="flex flex-wrap items-center gap-2">
-        {/* Search */}
-        <input
-          type="search"
-          placeholder="Search…"
-          value={q}
-          onChange={(e) => onSearchChange(e.target.value)}
-          className="h-8 w-44 rounded-full border border-zinc-800 bg-zinc-900/80 px-3.5 text-xs text-zinc-100 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-700"
+    <div className="sticky top-0 z-20 -mx-4 mb-4 bg-[#0a0a0a]/85 px-4 py-3 backdrop-blur-xl sm:-mx-6 sm:px-6">
+      <div className="flex items-center gap-2">
+        <div className="relative">
+          <svg
+            width="13" height="13" viewBox="0 0 14 14" fill="none"
+            stroke="currentColor" strokeWidth="1.6"
+            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600"
+          >
+            <circle cx="6" cy="6" r="4.2" />
+            <path d="M9.2 9.2L12.5 12.5" />
+          </svg>
+          <input
+            type="search"
+            placeholder="Search…"
+            value={q}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="h-8 w-40 rounded-full border border-zinc-800 bg-zinc-900/60 pl-8 pr-3 text-xs text-zinc-100 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-700 sm:w-52"
+          />
+        </div>
+
+        <FilterMenu
+          label="Era"
+          value={activeEra}
+          onChange={(v) => setParam('era', v)}
+          options={VEHICLE_ERAS.filter((e) => e !== 'other').map((e) => ({
+            value: e,
+            label: VEHICLE_ERA_LABELS[e],
+          }))}
         />
 
-        <Sep />
+        <FilterMenu
+          label="Type"
+          value={activeType}
+          onChange={(v) => setParam('type', v)}
+          options={VEHICLE_TYPES.filter((t) => t !== 'other').map((t) => ({
+            value: t,
+            label: VEHICLE_TYPE_LABELS[t],
+          }))}
+        />
 
-        {/* Era */}
-        {VEHICLE_ERAS.filter((e) => e !== 'other').map((era) => (
-          <Pill key={era} active={activeEra === era} onClick={() => toggle('era', era)}>
-            {VEHICLE_ERA_LABELS[era]}
-          </Pill>
-        ))}
-
-        <Sep />
-
-        {/* Type */}
-        {VEHICLE_TYPES.filter((t) => t !== 'other').map((type) => (
-          <Pill key={type} active={activeType === type} onClick={() => toggle('type', type)}>
-            {VEHICLE_TYPE_LABELS[type]}
-          </Pill>
-        ))}
-
-        <Sep />
-
-        {/* Nation — dropdown instead of 20+ pills */}
-        <select
+        <FilterMenu
+          label="Nation"
           value={activeNation}
-          onChange={(e) => {
-            pushParams((p) => {
-              if (e.target.value) p.set('nation', e.target.value);
-              else                p.delete('nation');
-            });
-          }}
-          className={
-            'h-8 cursor-pointer rounded-full border px-3 text-xs focus:outline-none focus:ring-1 focus:ring-zinc-700 ' +
-            (activeNation
-              ? 'border-zinc-100 bg-zinc-100 text-zinc-900'
-              : 'border-zinc-800 bg-zinc-900/80 text-zinc-400')
-          }
-        >
-          <option value="">All nations</option>
-          {availableNations.map((n) => (
-            <option key={n} value={n}>{nationFlag(n)} {n}</option>
-          ))}
-        </select>
+          onChange={(v) => setParam('nation', v)}
+          options={availableNations.map((n) => ({
+            value: n,
+            label: `${nationFlag(n)} ${n}`.trim(),
+          }))}
+        />
 
-        {/* Clear */}
-        {anyActive && (
+        <div className="ml-auto">
+          <ViewSwitcher />
+        </div>
+      </div>
+
+      {chips.length > 0 && (
+        <div className="mt-2 flex flex-wrap items-center gap-1.5">
+          {chips.map((c) => (
+            <button
+              key={c.key}
+              onClick={() => setParam(c.key, '')}
+              className="group flex h-6 items-center gap-1.5 rounded-full bg-zinc-800/80 pl-2.5 pr-2 text-[11px] text-zinc-300 transition-colors hover:bg-zinc-700"
+            >
+              {c.label}
+              <svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.8" className="text-zinc-500 group-hover:text-zinc-200">
+                <path d="M2 2l6 6M8 2l-6 6" />
+              </svg>
+            </button>
+          ))}
           <button
             onClick={clearAll}
-            className="ml-auto h-8 rounded-full border border-zinc-800 px-3 text-xs text-zinc-500 transition-colors hover:border-zinc-600 hover:text-zinc-200"
+            className="h-6 px-2 text-[11px] text-zinc-500 transition-colors hover:text-zinc-200"
           >
-            Clear
+            Clear all
           </button>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
-}
-
-function Pill({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
-  return (
-    <button
-      onClick={onClick}
-      className={
-        'h-8 rounded-full border px-3.5 text-xs font-medium transition-all ' +
-        (active
-          ? 'border-zinc-100 bg-zinc-100 text-zinc-900'
-          : 'border-zinc-800 bg-transparent text-zinc-400 hover:border-zinc-600 hover:text-zinc-200')
-      }
-    >
-      {children}
-    </button>
-  );
-}
-
-function Sep() {
-  return <div className="hidden h-4 w-px bg-zinc-800 sm:block" />;
 }
