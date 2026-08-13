@@ -122,6 +122,33 @@ export async function getStats(): Promise<Stats> {
   };
 }
 
+export interface LocationCount {
+  location: string;
+  count: number;
+}
+
+// Every distinct place a photo was taken, with how many photos came from it.
+// The museums page uses this instead of a hand-maintained "visited" flag.
+export async function getLocationCounts(): Promise<LocationCount[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('photos')
+    .select('location_taken')
+    .not('location_taken', 'is', null)
+    .returns<{ location_taken: string }[]>();
+  if (error) throw error;
+
+  const counts = new Map<string, number>();
+  for (const row of data ?? []) {
+    const key = row.location_taken.trim();
+    if (key) counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+
+  return Array.from(counts.entries())
+    .map(([location, count]) => ({ location, count }))
+    .sort((a, b) => b.count - a.count);
+}
+
 // For the map view: every photo with coordinates, plus enough vehicle info to label markers.
 export interface MapPhoto {
   id: string;
