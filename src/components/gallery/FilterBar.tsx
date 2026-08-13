@@ -87,7 +87,9 @@ export function FilterBar({ availableNations }: Props) {
 
   return (
     <div className="sticky top-0 z-20 -mx-4 mb-4 bg-[#0a0a0a]/85 px-4 py-3 backdrop-blur-xl sm:-mx-6 sm:px-6">
-      <div className="flex items-center gap-2">
+      {/* Wraps on narrow screens: search + three menus + the switcher overflow
+          a phone viewport on one line. */}
+      <div className="flex flex-wrap items-center gap-2">
         <div className="relative">
           <svg
             width="13" height="13" viewBox="0 0 14 14" fill="none"
@@ -136,7 +138,7 @@ export function FilterBar({ availableNations }: Props) {
           }))}
         />
 
-        <div className="ml-auto">
+        <div className="w-full sm:ml-auto sm:w-auto">
           <ViewSwitcher />
         </div>
       </div>
