@@ -1,11 +1,29 @@
 'use client';
 
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { useEffect, useState } from 'react';
+import { MapContainer, GeoJSON, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import Link from 'next/link';
 import 'leaflet/dist/leaflet.css';
+import type { FeatureCollection } from 'geojson';
 import { publicPhotoUrl } from '@/lib/storage';
 import type { MapPhoto } from '@/lib/supabase/queries';
+
+// The basemap is a self-hosted 110m Natural Earth outline (public domain),
+// not raster tiles. CARTO's free tile endpoint started requiring an API key and
+// is being retired, and every hosted alternative either needs a key or leans on
+// someone else's bandwidth. 73KB gzipped from our own origin has no key, no
+// rate limit, and nothing that can be withdrawn. The trade is no street detail,
+// which a world map of museum pins never needed — hence MAX_ZOOM below.
+const WORLD_URL = '/world-110m.geojson';
+const MAX_ZOOM = 7;
+
+const LAND_STYLE = {
+  fillColor: '#1f1f22',
+  fillOpacity: 1,
+  color: '#3a3a40',
+  weight: 0.6,
+} as const;
 
 // Pure-CSS marker so we don't have to ship leaflet's PNG icon files.
 const dotIcon = L.divIcon({
@@ -34,6 +52,23 @@ function groupByLocation(photos: MapPhoto[]) {
 }
 
 export function MapView({ photos }: Props) {
+  // Kept out of the JS bundle and fetched once, so the browser and CDN cache it
+  // like any other static asset instead of re-parsing it on every navigation.
+  const [world, setWorld] = useState<FeatureCollection | null>(null);
+  const [worldFailed, setWorldFailed] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(WORLD_URL)
+      .then((r) => {
+        if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+        return r.json();
+      })
+      .then((data: FeatureCollection) => { if (!cancelled) setWorld(data); })
+      .catch(() => { if (!cancelled) setWorldFailed(true); });
+    return () => { cancelled = true; };
+  }, []);
+
   if (photos.length === 0) {
     return (
       <div className="flex h-[70vh] items-center justify-center rounded-md border border-dashed border-zinc-800 text-sm text-zinc-500">
@@ -55,15 +90,18 @@ export function MapView({ photos }: Props) {
       <MapContainer
         center={center}
         zoom={3}
+        minZoom={2}
+        maxZoom={MAX_ZOOM}
+        maxBounds={[[-72, -200], [84, 200]]}
+        maxBoundsViscosity={0.9}
         scrollWheelZoom
+        worldCopyJump
+        attributionControl={false}
         style={{ height: '100%', width: '100%', background: '#0a0a0a' }}
       >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-          subdomains={['a', 'b', 'c', 'd']}
-          maxZoom={19}
-        />
+        {/* Markers stay usable if the outline ever fails to load, so the
+            basemap is rendered only once it has actually arrived. */}
+        {world && <GeoJSON data={world} style={() => LAND_STYLE} interactive={false} />}
         {groups.map((g) => (
           <Marker key={`${g.lat}|${g.lng}`} position={[g.lat, g.lng]} icon={dotIcon}>
             <Popup>
@@ -94,6 +132,11 @@ export function MapView({ photos }: Props) {
           </Marker>
         ))}
       </MapContainer>
+      {worldFailed && (
+        <div className="border-t border-zinc-800 px-3 py-1.5 text-xs text-zinc-500">
+          Basemap outline failed to load — markers are still plotted.
+        </div>
+      )}
     </div>
   );
 }
