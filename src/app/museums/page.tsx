@@ -20,18 +20,26 @@ export default async function MuseumsPage() {
   const claimed = new Set<string>();
   const countFor = (m: Museum) => {
     let total = 0;
+    // Track which location strings this entry covers, not just the total. A
+    // curated museum can absorb several (Imperial War Museum matches both its
+    // London and Duxford sites), and that decides how it can be linked.
+    const matched: string[] = [];
     for (const { location, count } of locations) {
       if (matchesMuseum(m, location)) {
         total += count;
+        matched.push(location);
         claimed.add(location);
       }
     }
-    return total;
+    return { total, matched };
   };
 
   const withCounts = MUSEUMS.map((region) => ({
     region: region.region,
-    museums: region.museums.map((m) => ({ museum: m, photos: countFor(m) })),
+    museums: region.museums.map((m) => {
+      const { total, matched } = countFor(m);
+      return { museum: m, photos: total, matched };
+    }),
   }));
 
   const all = withCounts.flatMap((r) => r.museums);
@@ -56,8 +64,14 @@ export default async function MuseumsPage() {
             {region.region}
           </h2>
           <div className="space-y-1">
-            {region.museums.map(({ museum: m, photos }) => {
+            {region.museums.map(({ museum: m, photos, matched }) => {
               const been = photos > 0;
+              // The exact location filter is precise, but only works when this
+              // entry maps to a single location string. Sites spanning several
+              // (or none yet) fall back to the fuzzy search that always worked.
+              const href = matched.length === 1
+                ? `/?location=${encodeURIComponent(matched[0])}`
+                : `/?q=${encodeURIComponent(m.match[0])}`;
               return (
                 <div
                   key={m.name}
@@ -86,7 +100,7 @@ export default async function MuseumsPage() {
                       </p>
                       {been && (
                         <Link
-                          href={`/?q=${encodeURIComponent(m.match[0])}`}
+                          href={href}
                           className="mt-1.5 inline-block text-xs text-emerald-500/80 transition-colors hover:text-emerald-400"
                         >
                           {photos} photo{photos === 1 ? '' : 's'} &rarr;
@@ -124,7 +138,7 @@ export default async function MuseumsPage() {
             {unlisted.map((l) => (
               <Link
                 key={l.location}
-                href={`/?q=${encodeURIComponent(l.location)}`}
+                href={`/?location=${encodeURIComponent(l.location)}`}
                 className="flex items-center gap-1.5 rounded-full border border-zinc-800 bg-zinc-950 px-3 py-1 text-xs text-zinc-400 transition-colors hover:border-zinc-600 hover:text-zinc-100"
               >
                 {l.location}

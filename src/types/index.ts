@@ -107,5 +107,7 @@ export interface GalleryFilters {
   era?: VehicleEra;
   type?: VehicleType;
   nation?: string;
+  /** Exact `photos.location_taken` value. Narrows photos, not just vehicles. */
+  location?: string;
   q?: string;
 }

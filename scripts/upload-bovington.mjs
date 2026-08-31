@@ -43,12 +43,13 @@ const UNCERTAIN = {
   'Covenanter': 'hull number T9143, inferred from the turret and running gear',
   'Challenger 1': 'one frame placard-confirmed; the outdoor plinth tank grouped with it is inferred',
   'Challenger 2': 'inferred from the Iraq/Afghanistan display context',
-  'Centurion': 'includes an "early turret" frame that may be a different mark',
+  'Centurion': 'includes an "early turret" frame that may be a different mark, and IMG_2108 whose subject is under a tarpaulin and identified by the photographer rather than from the image',
   'T-55': 'includes a distant outdoor frame labelled "t55 recover" that may be an ARV rather than a gun tank',
 };
 
-// IMG_2108 is deliberately absent: a tarpaulin-covered hull behind a fence at
-// distance, with nothing identifiable visible.
+// IMG_2108 shows a tarpaulin-covered hull behind a fence at distance, with
+// nothing identifiable in frame. Filed under Centurion on the photographer's
+// identification, not on anything visible in the photo.
 
 const VEHICLES = [
   { name: "Little Willie", type: "tank", era: "ww1", nation: "UK",
@@ -251,7 +252,8 @@ const VEHICLES = [
     files: ["IMG_2003Ha-Go.HEIC", "IMG_2004Ha-Go.HEIC"] },
   { name: "Centurion", type: "tank", era: "cold_war", nation: "UK",
     location: "The Tank Museum, Bovington",
-    files: ["IMG_1931centurion.HEIC", "IMG_1932centurion.HEIC", "IMG_1933centurion.HEIC", "early turret centurion.HEIC"] },
+    files: ["IMG_1931centurion.HEIC", "IMG_1932centurion.HEIC", "IMG_1933centurion.HEIC", "early turret centurion.HEIC",
+            "IMG_2108.HEIC"] },
   { name: "Centurion (Sectioned)", type: "tank", era: "cold_war", nation: "UK",
     location: "The Tank Museum, Bovington",
     files: ["IMG_2104cut apart centurion.HEIC", "IMG_2106cut apart centurion.HEIC"] },

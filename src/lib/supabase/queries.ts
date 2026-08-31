@@ -21,7 +21,7 @@ export async function getGalleryVehicles(
   const { data, error } = await query;
   if (error) throw error;
 
-  const vehicles = (data ?? []).map((row) => ({
+  let vehicles = (data ?? []).map((row) => ({
     id:         row.id,
     name:       row.name,
     type:       row.type,
@@ -30,6 +30,17 @@ export async function getGalleryVehicles(
     created_at: row.created_at,
     photos:     ((row.photos as Photo[]) ?? []).sort((a, b) => a.sort_order - b.sort_order),
   }));
+
+  // Location lives on photos, not vehicles, so this cannot be a column filter.
+  // It also has to narrow the photos themselves: a Sherman photographed at
+  // three museums must show only the one museum's shots when filtered, not all
+  // three. Vehicles left with nothing then drop out entirely.
+  if (filters.location) {
+    const wanted = filters.location.trim();
+    vehicles = vehicles
+      .map((v) => ({ ...v, photos: v.photos.filter((p) => p.location_taken?.trim() === wanted) }))
+      .filter((v) => v.photos.length > 0);
+  }
 
   // Free-text search runs in JS rather than as an ilike on `name`, so a query
   // can match the museum a photo was taken at ("Camden", "Seaport") or the

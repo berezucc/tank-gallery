@@ -14,9 +14,10 @@ import { ViewSwitcher } from './ViewProvider';
 
 interface Props {
   availableNations: string[];
+  availableLocations: { value: string; count: number }[];
 }
 
-export function FilterBar({ availableNations }: Props) {
+export function FilterBar({ availableNations, availableLocations }: Props) {
   const router   = useRouter();
   const pathname = usePathname();
   const params   = useSearchParams();
@@ -24,6 +25,7 @@ export function FilterBar({ availableNations }: Props) {
   const activeEra    = params.get('era')    ?? '';
   const activeType   = params.get('type')   ?? '';
   const activeNation = params.get('nation') ?? '';
+  const activeLocation = params.get('location') ?? '';
   const activeQ      = params.get('q')      ?? '';
 
   const [q, setQ] = useState(activeQ);
@@ -83,6 +85,7 @@ export function FilterBar({ availableNations }: Props) {
     activeEra    && { key: 'era',    label: VEHICLE_ERA_LABELS[activeEra as keyof typeof VEHICLE_ERA_LABELS] ?? activeEra },
     activeType   && { key: 'type',   label: VEHICLE_TYPE_LABELS[activeType as keyof typeof VEHICLE_TYPE_LABELS] ?? activeType },
     activeNation && { key: 'nation', label: `${nationFlag(activeNation)} ${activeNation}`.trim() },
+    activeLocation && { key: 'location', label: activeLocation },
   ].filter(Boolean) as { key: string; label: string }[];
 
   return (
@@ -135,6 +138,16 @@ export function FilterBar({ availableNations }: Props) {
           options={availableNations.map((n) => ({
             value: n,
             label: `${nationFlag(n)} ${n}`.trim(),
+          }))}
+        />
+
+        <FilterMenu
+          label="Place"
+          value={activeLocation}
+          onChange={(v) => setParam('location', v)}
+          options={availableLocations.map((l) => ({
+            value: l.value,
+            label: `${l.value} (${l.count})`,
           }))}
         />
 

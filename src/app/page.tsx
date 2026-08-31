@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
-import { getGalleryVehicles, getGalleryTotalCount } from '@/lib/supabase/queries';
+import { getGalleryVehicles, getGalleryTotalCount, getLocationCounts } from '@/lib/supabase/queries';
 import { FilterBar } from '@/components/gallery/FilterBar';
 import { GalleryGrid } from '@/components/gallery/GalleryGrid';
 import { GalleryViews } from '@/components/gallery/GalleryViews';
@@ -20,8 +20,9 @@ function parseFilters(raw: Record<string, string | undefined>): GalleryFilters {
   const filters: GalleryFilters = {};
   if (raw.era    && (VEHICLE_ERAS  as readonly string[]).includes(raw.era))   filters.era    = raw.era as VehicleEra;
   if (raw.type   && (VEHICLE_TYPES as readonly string[]).includes(raw.type))  filters.type   = raw.type as VehicleType;
-  if (raw.nation) filters.nation = raw.nation;
-  if (raw.q)      filters.q      = raw.q.trim();
+  if (raw.nation)   filters.nation   = raw.nation;
+  if (raw.location) filters.location = raw.location;
+  if (raw.q)        filters.q        = raw.q.trim();
   return filters;
 }
 
@@ -113,8 +114,13 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
       : 'grid';
 
   const filters  = parseFilters(flat);
-  const vehicles = await getGalleryVehicles(filters);
-  const isFiltered = Boolean(filters.era || filters.type || filters.nation || filters.q);
+  const [vehicles, locationCounts] = await Promise.all([
+    getGalleryVehicles(filters),
+    getLocationCounts(),
+  ]);
+  const isFiltered = Boolean(
+    filters.era || filters.type || filters.nation || filters.location || filters.q
+  );
 
   const cards: PhotoCard[] = vehicles.flatMap((v) =>
     v.photos.map((p) => ({
@@ -131,6 +137,11 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
   vehicles.forEach((v) => v.nation && nationSet.add(v.nation));
   if (flat.nation) nationSet.add(flat.nation);
   const availableNations = Array.from(nationSet).sort();
+
+  // Built from the whole archive rather than the filtered result, so narrowing
+  // to one museum doesn't collapse the menu to that single entry and strand you
+  // there. Ordered by photo count, so the places you shot most sit at the top.
+  const availableLocations = locationCounts.map((l) => ({ value: l.location, count: l.count }));
 
   // Only used for a ?photo=<id> deep link on first load. Ordinary clicks open
   // the lightbox from client state and never re-render this page.
@@ -179,7 +190,7 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
           while the content below reads the same view state. */}
       <ViewProvider initialView={initialView}>
         <Suspense fallback={null}>
-          <FilterBar availableNations={availableNations} />
+          <FilterBar availableNations={availableNations} availableLocations={availableLocations} />
         </Suspense>
 
         <LightboxProvider initialEntry={initialEntry} initialIndex={initialIndex}>
