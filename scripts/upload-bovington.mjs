@@ -35,7 +35,9 @@ const THUMB_MAX = 600;
 // Best guesses, not placard-confirmed. Listed here rather than buried so they
 // are easy to find and fix later.
 const UNCERTAIN = {
-  'Mark I': 'the photographer labelled ten frames "mark 1s"; Bovington displays Mark I, II, IV, V, VIII and IX, and these frames show no legible placard, so the group may mix marks',
+  'WW1 Heavy Tank': 'nine frames from the Mark-series halls whose placards are not legible even at full resolution; hull numbers IC 15, 12007, D52 and B46 are visible and would settle them against the museum catalogue',
+  'Medium Mark A Whippet': 'hull number A259 falls in the Whippet range; no placard in frame',
+  'Mark IV Replica': 'placard reads REPLICA and the hull carries THE TANK MUSEUM lettering — built for the film War Horse',
   'Vickers Medium Mk II': 'hull number T1020, inferred from the layout',
   'Vickers Light Tank Mk VI': 'unlabelled frame; inferred from the twin-weapon turret',
   'Carden-Loyd Carrier': 'registration MT 9909 on an interwar display; type inferred from the open-topped tracked hull',
@@ -55,9 +57,26 @@ const VEHICLES = [
   { name: "Little Willie", type: "tank", era: "ww1", nation: "UK",
     location: "The Tank Museum, Bovington",
     files: ["little willie?.HEIC"] },
-  { name: "Mark I", type: "tank", era: "ww1", nation: "UK",
+  // The "mark 1s" group turned out to be several different vehicles. Re-reading
+  // the frames at full resolution made the lectern placards legible, and they
+  // disagree with the filenames — so the group is split on what the placards
+  // actually say. The remainder keeps a plainly descriptive name rather than a
+  // falsely precise one.
+  { name: "Mark IV", type: "tank", era: "ww1", nation: "UK",
     location: "The Tank Museum, Bovington",
-    files: ["IMG_1893.HEIC", "IMG_1948mark 1s.HEIC", "IMG_1949mark 1s.HEIC", "IMG_1950mark 1s.HEIC", "IMG_1951mark 1s.HEIC", "IMG_1952mark 1s.HEIC", "IMG_1953mark 1s.HEIC", "IMG_1954mark 1s.HEIC", "IMG_1955mark 1s.HEIC", "IMG_1956mark 1s.HEIC", "IMG_1957mark 1s.HEIC", "another mark I.HEIC", "inside mark.HEIC"] },
+    files: ["IMG_1948mark 1s.HEIC"] },
+  { name: "Mark V", type: "tank", era: "ww1", nation: "UK",
+    location: "The Tank Museum, Bovington",
+    files: ["IMG_1950mark 1s.HEIC"] },
+  { name: "Medium Mark A Whippet", type: "tank", era: "ww1", nation: "UK",
+    location: "The Tank Museum, Bovington",
+    files: ["IMG_1893.HEIC"] },
+  { name: "Mark IV Replica", type: "tank", era: "ww1", nation: "UK",
+    location: "The Tank Museum, Bovington",
+    files: ["another mark I.HEIC"] },
+  { name: "WW1 Heavy Tank", type: "tank", era: "ww1", nation: "UK",
+    location: "The Tank Museum, Bovington",
+    files: ["IMG_1949mark 1s.HEIC", "IMG_1951mark 1s.HEIC", "IMG_1952mark 1s.HEIC", "IMG_1953mark 1s.HEIC", "IMG_1954mark 1s.HEIC", "IMG_1955mark 1s.HEIC", "IMG_1956mark 1s.HEIC", "IMG_1957mark 1s.HEIC", "inside mark.HEIC"] },
   { name: "Mark II Female - The Flying Scotsman", type: "tank", era: "ww1", nation: "UK",
     location: "The Tank Museum, Bovington",
     files: ["some mark tank idk.HEIC", "some mark tank idkk.HEIC"] },
