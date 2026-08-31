@@ -38,17 +38,33 @@ interface Props {
   photos: MapPhoto[];
 }
 
-// Group photos by rounded coordinates so a single museum doesn't render N
-// stacked markers — we render one marker per location with a list inside.
+// One marker per museum, listing everything photographed there.
+//
+// Grouping used to key on coordinates rounded to 4dp (~11m). That silently
+// assumed every photo from one museum shares a coordinate, which is false:
+// uploads carry per-shot EXIF GPS, so walking around a site spreads photos
+// across dozens of distinct points. Imperial War Museum's 28 photos landed on
+// 14 separate keys, drawing 14 markers stacked on top of each other — clicking
+// the top one showed a single vehicle and hid the other 27.
+//
+// The museum name is the real grouping key, so use it and place the marker at
+// the centroid of its photos. Coordinates remain the fallback for the rare
+// photo with no location string.
 function groupByLocation(photos: MapPhoto[]) {
   const groups = new Map<string, { lat: number; lng: number; photos: MapPhoto[] }>();
+
   for (const p of photos) {
-    const key = `${p.lat.toFixed(4)}|${p.lng.toFixed(4)}`;
+    const key = p.location_taken?.trim() || `${p.lat.toFixed(4)}|${p.lng.toFixed(4)}`;
     const existing = groups.get(key);
     if (existing) existing.photos.push(p);
     else groups.set(key, { lat: p.lat, lng: p.lng, photos: [p] });
   }
-  return Array.from(groups.values());
+
+  return Array.from(groups.values()).map((g) => ({
+    ...g,
+    lat: g.photos.reduce((s, p) => s + p.lat, 0) / g.photos.length,
+    lng: g.photos.reduce((s, p) => s + p.lng, 0) / g.photos.length,
+  }));
 }
 
 export function MapView({ photos }: Props) {
@@ -105,11 +121,17 @@ export function MapView({ photos }: Props) {
         {groups.map((g) => (
           <Marker key={`${g.lat}|${g.lng}`} position={[g.lat, g.lng]} icon={dotIcon}>
             <Popup>
-              <div style={{ maxWidth: 220 }}>
+              <div style={{ maxWidth: 240 }}>
                 <div style={{ fontSize: 11, color: '#666', marginBottom: 6 }}>
                   {g.photos[0].location_taken}
+                  {g.photos.length > 1 && ` · ${g.photos.length} photos`}
                 </div>
-                <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <ul style={{
+                  margin: 0, padding: 0, listStyle: 'none', display: 'flex',
+                  flexDirection: 'column', gap: 6,
+                  // Big sites run to dozens of photos; cap the popup and scroll.
+                  maxHeight: 260, overflowY: 'auto',
+                }}>
                   {g.photos.map((p) => (
                     <li key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
