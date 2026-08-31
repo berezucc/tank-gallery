@@ -49,6 +49,19 @@ for (const p of photos) {
   byLocation.get(loc).push(p.id);
 }
 
+// Nominatim never says "I don't know" — given an unresolvable query it returns
+// a loose match. Taking limit=1 on faith once put seven different Ontario
+// museums on the same Oshawa coordinate. So load every coordinate already in
+// use and refuse to write one that belongs to a DIFFERENT location: two
+// unrelated sites landing on one point means the geocoder guessed.
+const { data: placed } = await supabase
+  .from('photos').select('lat,lng,location_taken').not('lat', 'is', null);
+
+const claimed = new Map();
+for (const r of placed ?? []) {
+  claimed.set(`${r.lat.toFixed(4)},${r.lng.toFixed(4)}`, r.location_taken);
+}
+
 console.log(`Geocoding ${byLocation.size} distinct location(s) across ${photos.length} photo(s)…\n`);
 
 let ok = 0, fail = 0;
@@ -73,6 +86,15 @@ for (let i = 0; i < locations.length; i++) {
         continue;
       }
       coords = { lat: parseFloat(arr[0].lat), lng: parseFloat(arr[0].lon) };
+
+      const cell = `${coords.lat.toFixed(4)},${coords.lng.toFixed(4)}`;
+      const owner = claimed.get(cell);
+      if (owner && owner !== loc) {
+        console.log(`${label} ! "${loc}" — resolved onto "${owner}" at ${cell}; skipping rather than writing a guess`);
+        fail += 1;
+        continue;
+      }
+      claimed.set(cell, loc);
       cache.set(loc, coords);
     } catch (e) {
       console.error(`${label} ✗ "${loc}": ${e.message}`);
