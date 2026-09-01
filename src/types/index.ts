@@ -95,6 +95,25 @@ export interface TimelineVisit {
   photos: TimelinePhoto[];
 }
 
+/**
+ * A gallery card, flattened and pre-computed on the server.
+ *
+ * The grid used to render from PhotoGroup, which carries every column of every
+ * photo. Since chunks now arrive over the wire this holds only what a card
+ * draws, plus the lightbox entry it opens.
+ */
+export interface GridCard {
+  key: string;
+  heroUrl: string;
+  aspect: number;
+  blurDataURL?: string;
+  count: number;
+  vehicleName: string;
+  nation: string | null;
+  location: string | null;
+  entry: LightboxEntry;
+}
+
 // A group of photos sharing the same vehicle + location.
 // Grid shows one card per group; lightbox shows the carousel.
 export interface PhotoGroup {
