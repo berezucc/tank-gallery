@@ -38,6 +38,7 @@ export const MUSEUMS: MuseumRegion[] = [
       { name: 'Museu do Combatente', city: 'Lisbon', country: 'Portugal', flag: '\u{1F1F5}\u{1F1F9}', description: 'Portuguese overseas-war collection in the Belém fortress.', match: ['museu do combatente'] },
       { name: 'Castell de Montjuïc', city: 'Barcelona', country: 'Spain', flag: '\u{1F1EA}\u{1F1F8}', description: 'Hilltop fortress and former military prison overlooking the port.', match: ['montjuic'] },
       { name: 'Hrvatski pomorski muzej', city: 'Split', country: 'Croatia', flag: '\u{1F1ED}\u{1F1F7}', description: 'Croatian maritime museum — torpedoes, naval mines, coastal defence.', match: ['pomorski'] },
+      { name: 'Military History Museum', city: 'Chișinău', country: 'Moldova', flag: '\u{1F1F2}\u{1F1E9}', description: 'Outdoor Soviet-era garden on Tighina St — T-34-85, PT-76, BTR-60PB, MiG-17 and MiG-21.', match: ['chisinau'], url: 'https://www.army.md' },
       { name: 'Mostar', city: 'Mostar', country: 'Bosnia', flag: '\u{1F1E7}\u{1F1E6}', description: 'Bosnian War remnants around the rebuilt Stari Most.', match: ['mostar'] },
     ],
   },
