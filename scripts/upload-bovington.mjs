@@ -11,7 +11,21 @@
 // legible it wins; entries still resting on inference are listed in UNCERTAIN
 // below so they can be corrected with a single UPDATE.
 //
-// Run with:
+// WARNING: this script can no longer run. SRC below was deleted from Downloads
+// after the upload completed, so readdirSync fails at startup. It is kept as the
+// record of how the batch was catalogued, not as a re-runnable job.
+//
+// That deletion cost real quality. A later re-split of the WW1 group removed
+// those 13 photo rows and their storage objects intending to rebuild them under
+// corrected names — but by then the originals were gone. They were restored from
+// 1500px working renders instead of the 2400px originals, and their per-photo
+// EXIF GPS was replaced by the centroid of the surviving Bovington photos. The
+// other 188 photos here are unaffected.
+//
+// The lesson is ordering: verify the source still exists BEFORE deleting rows,
+// or run the upload first and let it fail closed.
+//
+// Run with (only if SRC is restored):
 //   node --env-file=.env.local scripts/upload-bovington.mjs --dry-run
 //   node --env-file=.env.local scripts/upload-bovington.mjs
 //
@@ -35,9 +49,9 @@ const THUMB_MAX = 600;
 // Best guesses, not placard-confirmed. Listed here rather than buried so they
 // are easy to find and fix later.
 const UNCERTAIN = {
-  'WW1 Heavy Tank': 'nine frames from the Mark-series halls whose placards are not legible even at full resolution; hull numbers IC 15, 12007, D52 and B46 are visible and would settle them against the museum catalogue',
-  'Medium Mark A Whippet': 'hull number A259 falls in the Whippet range; no placard in frame',
-  'Mark IV Replica': 'placard reads REPLICA and the hull carries THE TANK MUSEUM lettering — built for the film War Horse',
+  'WW1 Heavy Tank': 'three interior frames — engine bay and transmission — with no exterior or placard in shot to identify which hull they belong to',
+  'Mark VIII Liberty': 'IMG_1953 carries serial 12007, which the catalogue matches to the Mark VIII; IMG_1955 is a rear view of what appears to be the same green hull, grouped on appearance rather than a second number',
+  'Mark IV': 'IMG_1948 placard reads MARK IV (MALE); IMG_1956 carries the display marking D52, which is a painted battle number rather than a catalogue serial and does not appear in the published collection',
   'Vickers Medium Mk II': 'hull number T1020, inferred from the layout',
   'Vickers Light Tank Mk VI': 'unlabelled frame; inferred from the twin-weapon turret',
   'Carden-Loyd Carrier': 'registration MT 9909 on an interwar display; type inferred from the open-topped tracked hull',
@@ -57,113 +71,38 @@ const VEHICLES = [
   { name: "Little Willie", type: "tank", era: "ww1", nation: "UK",
     location: "The Tank Museum, Bovington",
     files: ["little willie?.HEIC"] },
-  // The "mark 1s" group turned out to be several different vehicles. Re-reading
-  // the frames at full resolution made the lectern placards legible, and they
-  // disagree with the filenames — so the group is split on what the placards
-  // actually say. The remainder keeps a plainly descriptive name rather than a
-  // falsely precise one.
+  // The "mark 1s" group turned out to be several different vehicles. Full-
+  // resolution re-reads made the placards and hull numbers legible, and those
+  // numbers resolve against the museum's published WW1 collection:
+  //
+  //   IC 15   -> Mark IX APC (serial 936)
+  //   12007   -> Mark VIII "Liberty"
+  //   A259    -> Medium Mark A Whippet "Caesar II" — the tank Lt Cecil Sewell
+  //              won a Victoria Cross from at Fremicourt, Aug 1918
+  //   B46     -> Mark IV "Big Brute", the running replica built for War Horse
+  //   285     -> Mark II "The Flying Scotsman" (handled separately below)
   { name: "Mark IV", type: "tank", era: "ww1", nation: "UK",
     location: "The Tank Museum, Bovington",
-    files: ["IMG_1948mark 1s.HEIC"] },
+    files: ["IMG_1948mark 1s.HEIC", "IMG_1956mark 1s.HEIC"] },
   { name: "Mark V", type: "tank", era: "ww1", nation: "UK",
     location: "The Tank Museum, Bovington",
-    files: ["IMG_1950mark 1s.HEIC"] },
-  { name: "Medium Mark A Whippet", type: "tank", era: "ww1", nation: "UK",
+    files: ["IMG_1950mark 1s.HEIC", "IMG_1954mark 1s.HEIC"] },
+  { name: "Mark IX", type: "tank", era: "ww1", nation: "UK",
+    location: "The Tank Museum, Bovington",
+    files: ["IMG_1949mark 1s.HEIC"] },
+  { name: "Mark VIII Liberty", type: "tank", era: "ww1", nation: "UK",
+    location: "The Tank Museum, Bovington",
+    files: ["IMG_1953mark 1s.HEIC", "IMG_1955mark 1s.HEIC"] },
+  { name: "Medium Mark A Whippet - Caesar II", type: "tank", era: "ww1", nation: "UK",
     location: "The Tank Museum, Bovington",
     files: ["IMG_1893.HEIC"] },
-  { name: "Mark IV Replica", type: "tank", era: "ww1", nation: "UK",
+  { name: "Mark IV - Big Brute (Replica)", type: "tank", era: "ww1", nation: "UK",
     location: "The Tank Museum, Bovington",
-    files: ["another mark I.HEIC"] },
+    files: ["another mark I.HEIC", "IMG_1957mark 1s.HEIC"] },
+  // Three interior frames with no identifiable exterior in shot.
   { name: "WW1 Heavy Tank", type: "tank", era: "ww1", nation: "UK",
     location: "The Tank Museum, Bovington",
-    files: ["IMG_1949mark 1s.HEIC", "IMG_1951mark 1s.HEIC", "IMG_1952mark 1s.HEIC", "IMG_1953mark 1s.HEIC", "IMG_1954mark 1s.HEIC", "IMG_1955mark 1s.HEIC", "IMG_1956mark 1s.HEIC", "IMG_1957mark 1s.HEIC", "inside mark.HEIC"] },
-  { name: "Mark II Female - The Flying Scotsman", type: "tank", era: "ww1", nation: "UK",
-    location: "The Tank Museum, Bovington",
-    files: ["some mark tank idk.HEIC", "some mark tank idkk.HEIC"] },
-  { name: "Renault FT-17", type: "tank", era: "ww1", nation: "France",
-    location: "The Tank Museum, Bovington",
-    files: ["renault ft17.HEIC"] },
-  { name: "Rolls-Royce Armoured Car", type: "vehicle", era: "ww1", nation: "UK",
-    location: "The Tank Museum, Bovington",
-    files: ["rolls royce armoured car.HEIC"] },
-  { name: "Vickers Medium Mk I", type: "tank", era: "other", nation: "UK",
-    location: "The Tank Museum, Bovington",
-    files: ["vickers mediu,.HEIC"] },
-  { name: "Vickers Medium Mk II", type: "tank", era: "other", nation: "UK",
-    location: "The Tank Museum, Bovington",
-    files: ["t1020 idk tank ww1?.HEIC"] },
-  { name: "Vickers-Armstrongs Mark E", type: "tank", era: "other", nation: "UK",
-    location: "The Tank Museum, Bovington",
-    files: ["vickers armsrong tnak.HEIC"] },
-  { name: "Vickers Light Tank Mk VI", type: "tank", era: "other", nation: "UK",
-    location: "The Tank Museum, Bovington",
-    files: ["IMG_1899.HEIC"] },
-  { name: "Light Tank Mk IIA", type: "tank", era: "other", nation: "UK",
-    location: "The Tank Museum, Bovington",
-    files: ["light tank mark IIA.HEIC"] },
-  { name: "Carden-Loyd Carrier", type: "vehicle", era: "other", nation: "UK",
-    location: "The Tank Museum, Bovington",
-    files: ["mt9909, not sure.HEIC"] },
-  { name: "Crossley-Chevrolet Armoured Car", type: "vehicle", era: "other", nation: "UK",
-    location: "The Tank Museum, Bovington",
-    files: ["crossely chevrolet.HEIC"] },
-  { name: "Crusader III", type: "tank", era: "ww2", nation: "UK",
-    location: "The Tank Museum, Bovington",
-    files: ["Crusader III!.HEIC"] },
-  { name: "Daimler Dingo Scout Car", type: "vehicle", era: "ww2", nation: "UK",
-    location: "The Tank Museum, Bovington",
-    files: ["Dingp Scout Car.HEIC"] },
-  { name: "Char B1 bis", type: "tank", era: "ww2", nation: "France",
-    location: "The Tank Museum, Bovington",
-    files: ["IMG_1902char b2.HEIC", "IMG_1903char b2.HEIC", "char b2.HEIC"] },
-  { name: "Somua S35", type: "tank", era: "ww2", nation: "France",
-    location: "The Tank Museum, Bovington",
-    files: ["somau s35.HEIC"] },
-  { name: "Tiger 131", type: "tank", era: "ww2", nation: "Germany",
-    location: "The Tank Museum, Bovington",
-    files: ["IMG_1904tiger 1.HEIC", "IMG_1905tiger 1.HEIC", "IMG_1906tiger 1.HEIC", "IMG_1907tiger 1.HEIC", "IMG_1908tiger 1.HEIC", "IMG_1909tiger 1.HEIC", "IMG_1910tiger 1.HEIC"] },
-  { name: "Tiger II", type: "tank", era: "ww2", nation: "Germany",
-    location: "The Tank Museum, Bovington",
-    files: ["IMG_2014Tiger II King Tiger.HEIC", "IMG_2015Tiger II King Tiger.HEIC", "IMG_2016Tiger II King Tiger.HEIC", "IMG_2017Tiger II King Tiger.HEIC", "IMG_2020Tiger II King Tiger.HEIC"] },
-  { name: "Panther", type: "tank", era: "ww2", nation: "Germany",
-    location: "The Tank Museum, Bovington",
-    files: ["panther.HEIC"] },
-  { name: "Panzer I Command Tank", type: "tank", era: "ww2", nation: "Germany",
-    location: "The Tank Museum, Bovington",
-    files: ["panzer I command.HEIC"] },
-  { name: "Panzer II", type: "tank", era: "ww2", nation: "Germany",
-    location: "The Tank Museum, Bovington",
-    files: ["IMG_2009panzer II.HEIC", "IMG_2010panzer II.HEIC", "IMG_2011panzer II.HEIC", "IMG_2012panzer II.HEIC", "panzer 2.HEIC"] },
-  { name: "Panzer III", type: "tank", era: "ww2", nation: "Germany",
-    location: "The Tank Museum, Bovington",
-    files: ["IMG_1913panzer 3.HEIC", "IMG_1914panzer 3.HEIC", "IMG_1994panzer III.HEIC", "IMG_1995panzer III.HEIC", "IMG_1996panzer III.HEIC"] },
-  { name: "Panzer IV", type: "tank", era: "ww2", nation: "Germany",
-    location: "The Tank Museum, Bovington",
-    files: ["IMG_2031panzer IV.HEIC", "IMG_2032panzer IV.HEIC", "IMG_2033panzer IV.HEIC"] },
-  { name: "StuG III", type: "tank", era: "ww2", nation: "Germany",
-    location: "The Tank Museum, Bovington",
-    files: ["IMG_2036stug III.HEIC", "IMG_2037stug III.HEIC", "IMG_2038stug III.HEIC", "IMG_2039stug III.HEIC", "IMG_2040stug III.HEIC"] },
-  { name: "Jagdpanther", type: "tank", era: "ww2", nation: "Germany",
-    location: "The Tank Museum, Bovington",
-    files: ["IMG_2067jagdpanther.HEIC", "IMG_2068jagdpanther.HEIC", "IMG_2069jagdpanther.HEIC", "IMG_2070jagdpanther.HEIC", "IMG_2071jagdpanther.HEIC", "IMG_2072jagdpanther.HEIC"] },
-  { name: "Jagdtiger", type: "tank", era: "ww2", nation: "Germany",
-    location: "The Tank Museum, Bovington",
-    files: ["IMG_2054jagdtiger.HEIC", "IMG_2056jagdtiger.HEIC", "IMG_2057jagdtiger.HEIC", "IMG_2058jagdtiger.HEIC", "IMG_2059jagdtiger.HEIC", "IMG_2060jagdtiger.HEIC", "IMG_2061jagdtiger.HEIC", "IMG_2062jagdtiger.HEIC", "IMG_2063jagdtiger.HEIC"] },
-  { name: "Jagdpanzer 38 Hetzer", type: "tank", era: "ww2", nation: "Germany",
-    location: "The Tank Museum, Bovington",
-    files: ["IMG_2050hetzer.HEIC", "IMG_2051hetzer.HEIC"] },
-  { name: "Nashorn", type: "tank", era: "ww2", nation: "Germany",
-    location: "The Tank Museum, Bovington",
-    files: ["IMG_1915nashron.HEIC", "IMG_1916nashron.HEIC", "IMG_1917nashron.HEIC"] },
-  { name: "Sd Kfz 234/3", type: "vehicle", era: "ww2", nation: "Germany",
-    location: "The Tank Museum, Bovington",
-    files: ["IMG_2025Sd Kfz 234:3.HEIC", "IMG_2026Sd Kfz 234:3.HEIC"] },
-  { name: "Sd Kfz 251", type: "vehicle", era: "ww2", nation: "Germany",
-    location: "The Tank Museum, Bovington",
-    files: ["Sd Kfz 251.HEIC"] },
-  { name: "Cromwell", type: "tank", era: "ww2", nation: "UK",
-    location: "The Tank Museum, Bovington",
-    files: ["IMG_1937cromwell.HEIC", "IMG_1938cromwell.HEIC"] },
+    files: ["IMG_1951mark 1s.HEIC", "IMG_1952mark 1s.HEIC", "inside mark.HEIC"] },
   { name: "Comet", type: "tank", era: "ww2", nation: "UK",
     location: "The Tank Museum, Bovington",
     files: ["IMG_1961comet.HEIC", "IMG_1962comet.HEIC", "IMG_1963comet.HEIC", "IMG_1964comet.HEIC", "IMG_1965comet.HEIC", "IMG_1966comet.HEIC"] },
