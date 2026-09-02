@@ -85,6 +85,7 @@ export function TimelineView({ visits }: Props) {
                       alt={p.vehicle_name}
                       fill
                       sizes="300px"
+                      unoptimized
                       className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                     />
                     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-1.5 opacity-0 transition-opacity group-hover:opacity-100">

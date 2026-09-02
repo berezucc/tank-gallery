@@ -145,6 +145,13 @@ export function Lightbox({ entry, index, origin, onClose, onGoTo }: Props) {
                   alt={vehicle.name}
                   width={photo.width  ?? 1600}
                   height={photo.height ?? 1200}
+                  // The only place optimization still earns its keep: the source
+                  // is a ~1.1MB 2400px original and this turns it into roughly a
+                  // fifth of that. A single `sizes` hint keeps it to one derived
+                  // width per photo instead of one per device breakpoint, which
+                  // is what makes the transformation budget bounded by "photos
+                  // somebody opened" rather than "photos that exist".
+                  sizes="(max-width: 1152px) 100vw, 1152px"
                   className="pointer-events-none max-h-[75vh] w-auto select-none object-contain"
                   draggable={false}
                   priority

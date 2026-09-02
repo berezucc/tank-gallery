@@ -111,6 +111,7 @@ export function PhotoRow({ photoId, storagePath, thumbnailPath, vehicle, locatio
             alt={vehicle?.name ?? 'photo'}
             fill
             sizes="64px"
+            unoptimized
             className="object-cover"
           />
         </div>
