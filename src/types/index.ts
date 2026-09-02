@@ -49,6 +49,14 @@ export interface LightboxPhoto {
   width: number | null;
   height: number | null;
   location_taken: string | null;
+  /**
+   * Per-photo vehicle, for entries whose photos are NOT all the same vehicle.
+   * A grid card omits it — every photo in that entry shares `entry.vehicle`.
+   * A timeline visit sets it on each photo, because one visit spans a whole
+   * museum: without it the caption froze on the first photo's vehicle and a
+   * Mustang read as "Aircraft · WW2 · Germany" all the way through.
+   */
+  vehicle?: LightboxVehicle;
 }
 
 export interface LightboxVehicle {

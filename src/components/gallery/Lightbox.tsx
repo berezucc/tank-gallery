@@ -25,6 +25,9 @@ export function Lightbox({ entry, index, origin, onClose, onGoTo }: Props) {
   const isOpen = Boolean(entry && entry.photos.length > 0);
   const photo = entry?.photos[index] ?? null;
   const count = entry?.photos.length ?? 0;
+  // A timeline visit mixes vehicles, so the caption follows the photo. Grid
+  // cards carry one vehicle for the whole set and leave photo.vehicle unset.
+  const vehicle = photo?.vehicle ?? entry?.vehicle ?? null;
 
   const go = (delta: number) => onGoTo(Math.min(Math.max(index + delta, 0), count - 1));
 
@@ -92,7 +95,7 @@ export function Lightbox({ entry, index, origin, onClose, onGoTo }: Props) {
 
   return (
     <AnimatePresence>
-      {isOpen && entry && photo && (
+      {isOpen && entry && photo && vehicle && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -139,7 +142,7 @@ export function Lightbox({ entry, index, origin, onClose, onGoTo }: Props) {
               >
                 <Image
                   src={publicPhotoUrl(photo.storage_path)}
-                  alt={entry.vehicle.name}
+                  alt={vehicle.name}
                   width={photo.width  ?? 1600}
                   height={photo.height ?? 1200}
                   className="pointer-events-none max-h-[75vh] w-auto select-none object-contain"
@@ -175,12 +178,12 @@ export function Lightbox({ entry, index, origin, onClose, onGoTo }: Props) {
 
             <div className="text-center">
               <h2 className="flex items-center justify-center gap-2 text-xl font-semibold text-white">
-                <Flag nation={entry.vehicle.nation} />
-                {entry.vehicle.name}
+                <Flag nation={vehicle.nation} />
+                {vehicle.name}
               </h2>
               <p className="mt-1 text-sm text-zinc-400">
-                {VEHICLE_TYPE_LABELS[entry.vehicle.type]} · {VEHICLE_ERA_LABELS[entry.vehicle.era]}
-                {entry.vehicle.nation ? ` · ${entry.vehicle.nation}` : ''}
+                {VEHICLE_TYPE_LABELS[vehicle.type]} · {VEHICLE_ERA_LABELS[vehicle.era]}
+                {vehicle.nation ? ` · ${vehicle.nation}` : ''}
               </p>
               {photo.location_taken && (
                 <p className="mt-1 text-xs text-zinc-500">{photo.location_taken}</p>

@@ -1,15 +1,26 @@
 // Upload the RAF Museum London (Hendon) batch (31 Aug 2026) to Supabase.
 //
-// 71 photos across 36 subjects. The files arrived unlabelled, so every name
+// 71 photos across 42 subjects. The files arrived unlabelled, so every name
 // here comes from identification: wherever a lectern placard was in frame it
 // was read at full resolution and its wording wins. Rendering at 1600px rather
 // than thumbnail size is what made that possible — at 560px none of these
 // placards are legible.
 //
+// CORRECTED 2 Sep 2026. The first pass had 18 photos on the wrong subject and
+// this table now reflects the fixes; scripts/fix-raf-hendon-ids.mjs moved the
+// already-uploaded rows and carries the per-photo reasoning. The failure mode
+// was assuming a run of consecutive frames stayed on the exhibit whose placard
+// opened it — in a shared bay it does not, which is how a P-51 ended up filed
+// as an Me 262 and a Ferret as an Avro Vulcan. Identify each frame on its own.
+//
 // Placard-confirmed: Spitfire LF.XVIe, Avro 504K, Albatros D.Va, B.E.2b,
 // Beaufighter TF.X, Hawker Typhoon IB, Gloster Meteor F8, Avro Vulcan B Mk 2
 // "Tin Triangle" (617 Sqn), Junkers Ju 87D/G-2, Messerschmitt Bf 110G-4,
-// Heinkel He 162 Volksjager, Blackburn Buccaneer XW547, Short Sunderland ML824.
+// Heinkel He 111H-20, Heinkel He 162 Volksjager, Messerschmitt Me 163B Komet,
+// Kawasaki Ki-100-1b, Daimler Ferret, Blackburn Buccaneer XW547, Sunderland
+// ML824. Types cross-checked against the museum's published collection:
+// Stranraer 920, Halifax II W1048, Beaufort VIII DD931, Me 163B-1a 191614,
+// P-51D 413317 and the Jaguar are all confirmed Hendon airframes.
 //
 // Run with:
 //   node --env-file=.env.local scripts/upload-raf-hendon.mjs --dry-run
@@ -35,18 +46,17 @@ const THUMB_MAX = 600;
 
 // Names resting on inference rather than a legible placard.
 const UNCERTAIN = {
-  'RAF Armoured Car': 'an RAF-marked wheeled armoured car named FRIGHT in desert scheme; the type is not readable in frame',
-  'Short Sunderland': 'IMG_2299 shows codes NS-Z, but IMG_2330/2331 are a flying boat coded QN- and numbered 920 photographed in a different hall — possibly a second airframe rather than the same one',
+  'RAF Armoured Car': 'an RAF-marked wheeled armoured car named FRIGHT in desert scheme; the type is not readable in frame and no published list of the museum\u2019s vehicles names it',
   'Sopwith Camel': 'a WW1 rotary-engined scout hanging in the Grahame-White hangar; the museum shows several similar types and no placard is in shot',
-  'Eurofighter Typhoon': 'IMG_2307 is clearly a Typhoon; IMG_2308 is a grey swing-wing jet coded AD grouped with it that may instead be a Tornado',
-  'Harrier GR': 'desert-scheme Harrier; the GR mark is not determinable from the frame',
-  'Jet Cockpit': 'three cockpit interiors with no exterior in shot — the instrument labelling suggests a Buccaneer or Tornado',
+  'Blackburn Buccaneer': 'IMG_2311/2313/2314 are XW547 and certain; IMG_2312 is a desert-pink airframe seen from underneath, grouped here because its circular intake and tandem canopies match XW547 \u2014 but a grey Harrier stands directly behind it and the frame does not settle which one fills it',
+  'Jet Cockpit': 'four frames of one bare-metal cutaway jet with no exterior in shot \u2014 an ejection seat and a gyro gunsight panel, so a Hunter or Meteor T.7, but nothing in frame decides it',
   'Air-Launched Weapons': 'a rack of missiles and guided bombs rather than a single vehicle',
 };
 
+
 const VEHICLES = [
   { name: "Supermarine Spitfire", type: "aircraft", era: "ww2", nation: "UK",
-    files: ["IMG_2293", "IMG_2317", "IMG_2318", "IMG_2319"] },
+    files: ["IMG_2293", "IMG_2317", "IMG_2318"] },
   { name: "Avro Blue Steel", type: "other", era: "cold_war", nation: "UK",
     files: ["IMG_2294", "IMG_2295"] },
   { name: "RAF Armoured Car", type: "vehicle", era: "ww2", nation: "UK",
@@ -54,7 +64,7 @@ const VEHICLES = [
   { name: "F-35 Lightning II", type: "aircraft", era: "modern", nation: "USA",
     files: ["IMG_2297", "IMG_2298"] },
   { name: "Short Sunderland", type: "aircraft", era: "ww2", nation: "UK",
-    files: ["IMG_2299", "IMG_2330", "IMG_2331"] },
+    files: ["IMG_2299"] },
   { name: "RAF Rescue Launch", type: "ship", era: "ww2", nation: "UK",
     files: ["IMG_2300"] },
   { name: "Bleriot XXVII", type: "aircraft", era: "ww1", nation: "France",
@@ -70,54 +80,67 @@ const VEHICLES = [
   { name: "Sopwith Camel", type: "aircraft", era: "ww1", nation: "UK",
     files: ["IMG_2306"] },
   { name: "Eurofighter Typhoon", type: "aircraft", era: "modern", nation: "UK",
-    files: ["IMG_2307", "IMG_2308"] },
+    files: ["IMG_2307"] },
+  { name: "SEPECAT Jaguar", type: "aircraft", era: "cold_war", nation: "UK",
+    files: ["IMG_2308", "IMG_2310"] },
   { name: "Air-Launched Weapons", type: "other", era: "modern", nation: "UK",
     files: ["IMG_2309"] },
-  { name: "Panavia Tornado", type: "aircraft", era: "modern", nation: "UK",
-    files: ["IMG_2310"] },
   { name: "Blackburn Buccaneer", type: "aircraft", era: "cold_war", nation: "UK",
-    files: ["IMG_2311", "IMG_2313", "IMG_2314"] },
-  { name: "Harrier GR", type: "aircraft", era: "modern", nation: "UK",
-    files: ["IMG_2312"] },
+    files: ["IMG_2311", "IMG_2312", "IMG_2313", "IMG_2314"] },
   { name: "MQ-9 Reaper", type: "aircraft", era: "modern", nation: "USA",
     files: ["IMG_2315", "IMG_2316"] },
   { name: "Hawker Typhoon", type: "aircraft", era: "ww2", nation: "UK",
-    files: ["IMG_2320", "IMG_2321", "IMG_2322"] },
+    files: ["IMG_2319", "IMG_2320", "IMG_2321"] },
   { name: "Jet Cockpit", type: "other", era: "cold_war", nation: "UK",
-    files: ["IMG_2323", "IMG_2324", "IMG_2325"] },
+    files: ["IMG_2322", "IMG_2323", "IMG_2324", "IMG_2325"] },
   { name: "Bristol Beaufighter", type: "aircraft", era: "ww2", nation: "UK",
     files: ["IMG_2327", "IMG_2328"] },
-  { name: "de Havilland Mosquito", type: "aircraft", era: "ww2", nation: "UK",
+  { name: "Bristol Beaufort", type: "aircraft", era: "ww2", nation: "UK",
     files: ["IMG_2329"] },
+  { name: "Supermarine Stranraer", type: "aircraft", era: "ww2", nation: "UK",
+    files: ["IMG_2330", "IMG_2331"] },
   { name: "Hawker Hurricane", type: "aircraft", era: "ww2", nation: "UK",
     files: ["IMG_2332", "IMG_2368"] },
   { name: "Messerschmitt Bf 109", type: "aircraft", era: "ww2", nation: "Germany",
     files: ["IMG_2333", "IMG_2334"] },
-  { name: "Gloster Gladiator", type: "aircraft", era: "ww2", nation: "UK",
-    files: ["IMG_2335", "IMG_2336"] },
+  { name: "Fiat CR.42 Falco", type: "aircraft", era: "ww2", nation: "Italy",
+    files: ["IMG_2335"] },
+  { name: "Phantom FGR.2", type: "aircraft", era: "cold_war", nation: "USA",
+    files: ["IMG_2336"] },
   { name: "de Havilland Vampire", type: "aircraft", era: "cold_war", nation: "UK",
-    files: ["IMG_2337", "IMG_2338"] },
+    files: ["IMG_2337"] },
+  { name: "Hawker Tempest", type: "aircraft", era: "ww2", nation: "UK",
+    files: ["IMG_2338"] },
   { name: "Gloster Meteor F8", type: "aircraft", era: "cold_war", nation: "UK",
     files: ["IMG_2339"] },
   { name: "English Electric Lightning", type: "aircraft", era: "cold_war", nation: "UK",
     files: ["IMG_2340", "IMG_2341"] },
   { name: "Consolidated B-24 Liberator", type: "aircraft", era: "ww2", nation: "USA",
-    files: ["IMG_2343", "IMG_2344"] },
+    files: ["IMG_2343"] },
+  { name: "Kawasaki Ki-100", type: "aircraft", era: "ww2", nation: "Japan",
+    files: ["IMG_2344"] },
   { name: "Yokosuka MXY-7 Ohka", type: "aircraft", era: "ww2", nation: "Japan",
     files: ["IMG_2345"] },
   { name: "Junkers Ju 87 Stuka", type: "aircraft", era: "ww2", nation: "Germany",
     files: ["IMG_2346", "IMG_2347"] },
   { name: "Heinkel He 111", type: "aircraft", era: "ww2", nation: "Germany",
-    files: ["IMG_2348", "IMG_2349", "IMG_2350"] },
+    files: ["IMG_2348", "IMG_2349"] },
+  { name: "Handley Page Halifax", type: "aircraft", era: "ww2", nation: "UK",
+    files: ["IMG_2350"] },
   { name: "Messerschmitt Bf 110", type: "aircraft", era: "ww2", nation: "Germany",
     files: ["IMG_2351", "IMG_2352", "IMG_2353"] },
   { name: "Avro Vulcan", type: "aircraft", era: "cold_war", nation: "UK",
-    files: ["IMG_2354", "IMG_2355", "IMG_2356", "IMG_2357", "IMG_2358", "IMG_2359"] },
-  { name: "Messerschmitt Me 262", type: "aircraft", era: "ww2", nation: "Germany",
-    files: ["IMG_2361", "IMG_2362", "IMG_2363"] },
+    files: ["IMG_2354", "IMG_2355", "IMG_2356", "IMG_2357"] },
+  { name: "Ferret", type: "vehicle", era: "cold_war", nation: "UK",
+    files: ["IMG_2358"] },
+  { name: "Messerschmitt Me 163 Komet", type: "aircraft", era: "ww2", nation: "Germany",
+    files: ["IMG_2359", "IMG_2361", "IMG_2362"] },
+  { name: "North American P-51D Mustang", type: "aircraft", era: "ww2", nation: "USA",
+    files: ["IMG_2363"] },
   { name: "Heinkel He 162", type: "aircraft", era: "ww2", nation: "Germany",
     files: ["IMG_2364", "IMG_2365"] },
 ];
+
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const key = process.env.SUPABASE_SERVICE_ROLE_KEY;

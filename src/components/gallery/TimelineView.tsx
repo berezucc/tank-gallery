@@ -28,10 +28,12 @@ export function TimelineView({ visits }: Props) {
   return (
     <div className="flex flex-col gap-10">
       {visits.map((visit) => {
-        // One lightbox entry per visit, so arrows walk the whole trip.
+        // One lightbox entry per visit, so arrows walk the whole trip. A visit
+        // spans a whole museum, so each photo carries its OWN vehicle — the
+        // entry-level one is only the fallback the type requires.
         const entry: LightboxEntry = {
           vehicle: {
-            name: visit.location ?? 'Unknown location',
+            name: visit.photos[0].vehicle_name,
             type: visit.photos[0].vehicle_type,
             era: visit.photos[0].vehicle_era,
             nation: visit.photos[0].vehicle_nation,
@@ -42,6 +44,12 @@ export function TimelineView({ visits }: Props) {
             width: p.width,
             height: p.height,
             location_taken: visit.location,
+            vehicle: {
+              name: p.vehicle_name,
+              type: p.vehicle_type,
+              era: p.vehicle_era,
+              nation: p.vehicle_nation,
+            },
           })),
         };
 
