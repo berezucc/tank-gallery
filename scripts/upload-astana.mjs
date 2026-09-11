@@ -33,11 +33,21 @@
 //   BMP-2       Long thin 30mm 2A42 in a two-man turret. The existing BMP-1 row
 //               is the 73mm 2A28 in a one-man turret — a different vehicle, so
 //               this gets its own row.
-//   T-72        Kontakt-1 ERA in rows on the turret front and glacis, NSVT on the
-//               cupola. At least two distinct hulls appear across these frames
+//   T-64        Kontakt-1 ERA in rows on the turret front and glacis, NSVT on the
+//               cupola. The running gear is the identifier: six SMALL, tightly
+//               spaced road wheels with metal rims, a ring of round lightening
+//               holes and only a thin tyre band, on a narrow track. A T-72 has
+//               large dished wheels with thick rubber and visible gaps between
+//               them. At least two distinct hulls appear across these frames
 //               (one with ERA, one without) and a third non-ERA MBT sits in the
-//               background of 13 and 05; none of the three is isolated well
-//               enough to separate, and all read as T-72 family.
+//               background of 13 and 05; none is isolated well enough to split.
+//               CORRECTED 2026-09-11 — this batch originally filed them as T-72.
+//               The wheels were read correctly on the first pass and then
+//               overridden because a travel-site summary of the museum's
+//               collection mentioned "танк Т-72". Letting a secondary source
+//               outrank a first-hand read of the photograph is what produced
+//               the error; the photographer confirmed T-64 on site. See
+//               scripts/fix-astana-t64.mjs for the re-file.
 //   ZSU-23-4    Quad 23mm on the GM-575 chassis. The video settles it: frame 0
 //               catches two of the four barrels above the hull port the hand is
 //               opening, and those hull ports match frame 19's superstructure.
@@ -115,7 +125,7 @@ const GROUPS = [
   { name: 'BMP-2', type: 'vehicle', era: 'cold_war', nation: 'USSR',
     files: ['astana-06-7d733761.jpg', 'astana-07-e0ebdcbe.jpg',
             'astana-09-4096a0b5.jpg', 'astana-05-23754243.jpg'] },
-  { name: 'T-72', type: 'tank', era: 'cold_war', nation: 'USSR',
+  { name: 'T-64', type: 'tank', era: 'cold_war', nation: 'USSR',
     files: ['astana-14-1169d0a0.jpg', 'astana-13-64a3f47d.jpg',
             'astana-11-edc3774e.jpg', 'astana-10-abac7d70.jpg',
             'astana-08-4e838896.jpg'] },

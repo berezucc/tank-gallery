@@ -65,7 +65,7 @@ export const MUSEUMS: MuseumRegion[] = [
   {
     region: 'Asia & Pacific',
     museums: [
-      { name: 'State Military-Historical Museum', city: 'Astana', country: 'Kazakhstan', flag: '\u{1F1F0}\u{1F1FF}', description: 'Open-air park beside the Russian embassy on Baraev St — MiG-29, T-72, Shilka, Grad, 2S1 and 2S3.', match: ['astana'] },
+      { name: 'State Military-Historical Museum', city: 'Astana', country: 'Kazakhstan', flag: '\u{1F1F0}\u{1F1FF}', description: 'Open-air park beside the Russian embassy on Baraev St — MiG-29, T-64, Shilka, Grad, 2S1 and 2S3.', match: ['astana'] },
       // Alias is deliberately 'museum, almaty' and not 'almaty': the Central Park
       // display across town is tagged 'Central Park, Almaty' and a bare city alias
       // would mark this museum visited from those photos. 'military history museum'
