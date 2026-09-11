@@ -78,20 +78,46 @@ const LAT = 43.2585;
 const LNG = 76.9572;
 const DATE = '2026-09-11';
 
+// SECOND PASS (frames 10-19). A later walk round the same site added a T-34-85,
+// a Katyusha and closer angles on the two tanks. Placards read on this pass:
+//   10  «Т-34-85» — medium tank, legible.
+//   11  «БМ-13НМ / BM-13NM», reactive system on a ZIL-157 base, 132mm,
+//       range 8470 m, mass 6900 kg, crew 5, 1941-1980. Fully legible.
+//   13/14/17  «Т-54» again, from three more angles.
+// Frames 15 and 16 arrived as byte-identical duplicates of 13 and 14 (verified
+// by md5) and were dropped rather than uploaded twice.
+// Frame 12 is the 376 tank on its own WITH its placard in shot — and it still
+// does not resolve: the plate is angled into the sun and the title smears at
+// every exposure. So 376 stays an inference. It is filed as T-55 and frame 12
+// carries that flag rather than the pairing frame.
+
 const UNCERTAIN = {
   'almaty-02-c4cc6a27.jpg':
-    'near tank read from its placard («Т-54»); the far tank 376 is filed as T-55 on cupola + IR searchlight only, its placard is unreadable',
+    'near tank read from its placard («Т-54»); the far tank 376 is filed as T-55 on cupola + IR searchlight only',
+  'almaty-12-eb61a249.jpg':
+    'tank 376 alone. Its placard IS in this frame and still unreadable — angled into the sun, title smears at every exposure. T-55 remains an inference from the cupola, IR searchlight and museum pairing.',
   'almaty-08-57b58878.jpg':
     'placard specs legible (203mm, 18 000 m, crew 12, from 1939 — the B-4 family) but the title glyphs read «БЛ-39», which matches no designation I can confirm',
   'almaty-09-6e033270.jpg':
     'filed on the ZiS-2 whose placard is unambiguous; the second gun sharing the frame reads «М-33», probably M-30 122mm howitzer (crew 8, ~2300 kg), unconfirmed',
+  'almaty-18-4adb52bf.jpg':
+    'steps group: a steeply elevated tube on a two-wheel carriage plus field howitzers on the terrace. No single subject and no legible title.',
+  'almaty-19-6332626a.jpg':
+    'same group closer. Placard title glyphs read «Б-11» — possibly the B-11 107mm recoilless rifle, but an M-160 160mm breech-loading mortar fits the shape equally. Filed descriptively rather than guessing.',
   'almaty-01-4ac8fc21.jpg':
     'indoor case of colours and mixed ordnance, no single subject — descriptive row, not a vehicle identification',
 };
 
 const GROUPS = [
   { name: 'T-54', type: 'tank', era: 'cold_war', nation: 'USSR',
-    files: ['almaty-02-c4cc6a27.jpg'] },
+    files: ['almaty-02-c4cc6a27.jpg', 'almaty-17-29a2cbd4.jpg',
+            'almaty-13-61240697.jpg', 'almaty-14-f0e086bd.jpg'] },
+  { name: 'T-55', type: 'tank', era: 'cold_war', nation: 'USSR',
+    files: ['almaty-12-eb61a249.jpg'] },
+  { name: 'T-34-85', type: 'tank', era: 'ww2', nation: 'USSR',
+    files: ['almaty-10-44a54fc3.jpg'] },
+  { name: 'BM-13 Katyusha', type: 'vehicle', era: 'ww2', nation: 'USSR',
+    files: ['almaty-11-71207ab6.jpg'] },
   { name: 'BRDM-1', type: 'vehicle', era: 'cold_war', nation: 'USSR',
     files: ['almaty-03-8b9c297e.jpg'] },
   { name: 'BTR-40', type: 'vehicle', era: 'cold_war', nation: 'USSR',
@@ -104,6 +130,8 @@ const GROUPS = [
     files: ['almaty-09-6e033270.jpg'] },
   { name: '203mm Heavy Howitzer', type: 'artillery', era: 'ww2', nation: 'USSR',
     files: ['almaty-08-57b58878.jpg'] },
+  { name: 'Soviet Towed Artillery', type: 'artillery', era: 'cold_war', nation: 'USSR',
+    files: ['almaty-19-6332626a.jpg', 'almaty-18-4adb52bf.jpg'] },
   { name: 'Soviet Ordnance Display', type: 'other', era: 'other', nation: 'USSR',
     files: ['almaty-01-4ac8fc21.jpg'] },
 ];

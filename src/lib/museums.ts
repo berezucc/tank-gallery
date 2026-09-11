@@ -66,7 +66,11 @@ export const MUSEUMS: MuseumRegion[] = [
     region: 'Asia & Pacific',
     museums: [
       { name: 'State Military-Historical Museum', city: 'Astana', country: 'Kazakhstan', flag: '\u{1F1F0}\u{1F1FF}', description: 'Open-air park beside the Russian embassy on Baraev St — MiG-29, T-72, Shilka, Grad, 2S1 and 2S3.', match: ['astana'] },
-      { name: 'Military History Museum', city: 'Almaty', country: 'Kazakhstan', flag: '\u{1F1F0}\u{1F1FF}', description: 'Zenkov St collection with trilingual placards — T-54, BTR-40, BRDM-1 and BRDM-2, BMP-1 and heavy artillery.', match: ['almaty'] },
+      // Alias is deliberately 'museum, almaty' and not 'almaty': the Central Park
+      // display across town is tagged 'Central Park, Almaty' and a bare city alias
+      // would mark this museum visited from those photos. 'military history museum'
+      // is no good either — it is a substring of the Hanoi entry below.
+      { name: 'Military History Museum', city: 'Almaty', country: 'Kazakhstan', flag: '\u{1F1F0}\u{1F1FF}', description: 'Zenkov St collection with trilingual placards — T-34-85, T-54, Katyusha, BTR-40, BRDM-1 and BRDM-2, BMP-1 and heavy artillery.', match: ['museum, almaty'] },
       { name: 'Yad la-Shiryon', city: 'Latrun', country: 'Israel', flag: '\u{1F1EE}\u{1F1F1}', description: 'Israeli Armored Corps museum. Hundreds of tanks in open-air displays.', match: ['yad la-shiryon', 'latrun'] },
       { name: 'JGSDF Public Information Center', city: 'Saitama', country: 'Japan', flag: '\u{1F1EF}\u{1F1F5}', description: 'Japan Ground Self-Defense Force. Type 10, Type 90, Type 74 on display.', match: ['jgsdf'] },
       { name: 'Yushukan Museum', city: 'Tokyo', country: 'Japan', flag: '\u{1F1EF}\u{1F1F5}', description: 'Yasukuni Shrine war museum. Zero fighter, kaiten torpedo, locomotive.', match: ['yushukan'] },
