@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { publicPhotoUrl } from '@/lib/storage';
 import { useRouter } from 'next/navigation';
 import { useDropzone } from 'react-dropzone';
 
@@ -431,10 +432,10 @@ interface CardProps {
 }
 
 function ItemCard({ item, onChange, onAttachExisting, onDetachExisting, onSave, onRemove }: CardProps) {
-  // For restored items (no File object), show the uploaded thumbnail from Supabase.
+  // For restored items (no File object), show the uploaded thumbnail from storage.
   const imgSrc = item.previewUrl
     ?? (item.upload?.thumbnail_path
-      ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/photos/${item.upload.thumbnail_path}`
+      ? publicPhotoUrl(item.upload.thumbnail_path)
       : undefined);
 
   return (

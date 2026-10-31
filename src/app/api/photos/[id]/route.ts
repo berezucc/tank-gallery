@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { STORAGE_BUCKET } from '@/lib/constants';
+import { removePhotos } from '@/lib/r2';
 
 // PATCH /api/photos/[id]
 // Body (all optional): { location_taken?, date_taken? }
@@ -60,7 +60,7 @@ export async function DELETE(
 
   const pathsToRemove = [photo.storage_path];
   if (photo.thumbnail_path) pathsToRemove.push(photo.thumbnail_path);
-  await supabase.storage.from(STORAGE_BUCKET).remove(pathsToRemove);
+  await removePhotos(pathsToRemove).catch(() => {});
 
   const { error: delErr } = await supabase.from('photos').delete().eq('id', id);
   if (delErr) return NextResponse.json({ error: delErr.message }, { status: 500 });

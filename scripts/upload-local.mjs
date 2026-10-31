@@ -1,4 +1,4 @@
-// Upload local photo folders to Supabase Storage + insert vehicle/photo rows.
+// Upload local photo folders to R2 + insert vehicle/photo rows in Supabase.
 //
 // Each folder maps to one vehicle; every image inside becomes a photo row.
 // HEIC is converted to JPEG via macOS `sips` (sharp has no HEIC decoder here),
@@ -14,6 +14,7 @@ import { createClient } from '@supabase/supabase-js';
 import { encode } from 'blurhash';
 import sharp from 'sharp';
 import WebSocket from 'ws';
+import { putPhoto } from './lib/r2.mjs';
 import { execFileSync } from 'node:child_process';
 import { mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -21,7 +22,6 @@ import path from 'node:path';
 
 const DRY = process.argv.includes('--dry-run');
 const ROOT = '/Users/nikita/Downloads';
-const BUCKET = 'photos';
 const FULL_MAX = 2400; // longest edge for the full-size render
 const THUMB_MAX = 600;
 
@@ -221,9 +221,7 @@ for (const f of FOLDERS) {
       }
 
       for (const [p, buf] of [[storagePath, full.data], [thumbPath, thumb]]) {
-        const { error } = await supabase.storage
-          .from(BUCKET).upload(p, buf, { contentType: 'image/jpeg', upsert: true });
-        if (error) throw error;
+        await putPhoto(p, buf, 'image/jpeg');
       }
 
       const { error: insErr } = await supabase.from('photos').insert(row);

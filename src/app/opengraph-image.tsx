@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og';
-import { STORAGE_BUCKET } from '@/lib/constants';
+import { publicPhotoUrl } from '@/lib/storage';
 
 export const alt = 'Archive — military hardware, in person';
 export const size = { width: 1200, height: 630 };
@@ -25,7 +25,7 @@ async function loadPreview(): Promise<{ urls: string[]; total: number }> {
     const total = Number(res.headers.get('content-range')?.split('/')[1] ?? 0);
 
     return {
-      urls: rows.map((r) => `${base}/storage/v1/object/public/${STORAGE_BUCKET}/${r.thumbnail_path ?? r.storage_path}`),
+      urls: rows.map((r) => publicPhotoUrl(r.thumbnail_path ?? r.storage_path)),
       total,
     };
   } catch {

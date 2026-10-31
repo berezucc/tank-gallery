@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { processImage } from '@/lib/images';
-import { STORAGE_BUCKET } from '@/lib/constants';
+import { putPhoto } from '@/lib/r2';
 
 // Body: multipart/form-data with a single `file` field.
 // Returns: { storage_path, thumbnail_path, blurhash, width, height }
@@ -46,18 +46,14 @@ export async function POST(request: Request) {
   const originalPath  = `originals/${id}.${ext}`;
   const thumbnailPath = `thumbs/${id}.webp`;
 
-  const [originalRes, thumbRes] = await Promise.all([
-    supabase.storage.from(STORAGE_BUCKET).upload(originalPath, buf, {
-      contentType: file.type || 'image/jpeg',
-    }),
-    supabase.storage.from(STORAGE_BUCKET).upload(thumbnailPath, processed.thumbnail, {
-      contentType: 'image/webp',
-    }),
-  ]);
-
-  if (originalRes.error || thumbRes.error) {
+  try {
+    await Promise.all([
+      putPhoto(originalPath, buf, file.type || 'image/jpeg'),
+      putPhoto(thumbnailPath, processed.thumbnail, 'image/webp'),
+    ]);
+  } catch (e) {
     return NextResponse.json(
-      { error: originalRes.error?.message ?? thumbRes.error?.message },
+      { error: e instanceof Error ? e.message : 'Upload failed' },
       { status: 500 }
     );
   }

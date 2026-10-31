@@ -67,5 +67,3 @@ export function nationFlag(nation: string | null): string {
   }
   return NATION_FLAG_MAP[nation] ?? '';
 }
-
-export const STORAGE_BUCKET = 'photos';

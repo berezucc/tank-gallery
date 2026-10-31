@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
     // full ~1.1MB), so re-deriving a dozen widths of a 38KB thumbnail costs a
     // transformation and saves a few KB.
     //
-    // Thumbnails are therefore served straight from Supabase's CDN (see the
+    // Thumbnails are therefore served straight from R2's public URL (see the
     // `unoptimized` prop on GalleryCard, TimelineView and the admin PhotoRow) —
     // they are the overwhelming majority of images the site draws. The lightbox
     // keeps optimization, because there it turns a 1.1MB original into roughly
@@ -22,8 +22,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**.supabase.co',
-        pathname: '/storage/v1/object/public/**',
+        hostname: '**.r2.dev',
       },
     ],
   },
