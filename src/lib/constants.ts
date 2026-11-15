@@ -52,6 +52,7 @@ const NATION_FLAG_MAP: Record<string, string> = {
   'Switzerland': '\u{1F1E8}\u{1F1ED}',
   'Bosnia':      '\u{1F1E7}\u{1F1E6}',
   'Yugoslavia':  '\u{1F1F7}\u{1F1F8}',
+  'Finland':     '\u{1F1EB}\u{1F1EE}',
 };
 
 // Resolves a nation string (possibly dual like "UK/USA") to flag emoji(s).
