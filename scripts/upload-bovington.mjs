@@ -175,7 +175,7 @@ const VEHICLES = [
   { name: "M4A2E8 Sherman - Fury", type: "tank", era: "ww2", nation: "USA",
     location: "The Tank Museum, Bovington",
     files: ["fury sherman.HEIC", "sherman (FROM FURY PLEASE INCLUDE)\\.HEIC"] },
-  { name: "M3 Lee", type: "tank", era: "ww2", nation: "USA",
+  { name: "M3 Grant", type: "tank", era: "ww2", nation: "USA",
     location: "The Tank Museum, Bovington",
     files: ["IMG_1997m3 lee.HEIC", "IMG_1998m3 lee.HEIC"] },
   { name: "M3 Stuart", type: "tank", era: "ww2", nation: "USA",
