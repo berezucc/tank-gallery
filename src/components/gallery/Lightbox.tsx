@@ -186,11 +186,13 @@ export function Lightbox({ entry, index, origin, onClose, onGoTo }: Props) {
             <div className="text-center">
               <h2 className="flex items-center justify-center gap-2 text-xl font-semibold text-white">
                 <Flag nation={vehicle.nation} />
+                {photo.operator && <Flag nation={photo.operator} />}
                 {vehicle.name}
               </h2>
               <p className="mt-1 text-sm text-zinc-400">
                 {VEHICLE_TYPE_LABELS[vehicle.type]} · {VEHICLE_ERA_LABELS[vehicle.era]}
                 {vehicle.nation ? ` · ${vehicle.nation}` : ''}
+                {photo.operator ? ` · operated by ${photo.operator}` : ''}
               </p>
               {photo.location_taken && (
                 <p className="mt-1 text-xs text-zinc-500">{photo.location_taken}</p>

@@ -80,6 +80,7 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
             width: p.width,
             height: p.height,
             location_taken: p.location_taken,
+            operator: p.operator,
           })),
         };
         initialIndex = idx;

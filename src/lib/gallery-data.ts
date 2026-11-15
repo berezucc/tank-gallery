@@ -73,6 +73,7 @@ export async function toGridCards(groups: PhotoGroup[]): Promise<GridCard[]> {
             width: p.width,
             height: p.height,
             location_taken: p.location_taken,
+            operator: p.operator,
           })),
         },
       };
@@ -112,6 +113,7 @@ export function buildVisits(cards: PhotoCard[]): TimelineVisit[] {
       vehicle_type: vehicle.type,
       vehicle_era: vehicle.era,
       vehicle_nation: vehicle.nation,
+      operator: photo.operator,
     });
   }
 

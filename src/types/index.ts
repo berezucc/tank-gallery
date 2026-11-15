@@ -21,6 +21,8 @@ export interface Photo {
   width: number | null;
   height: number | null;
   location_taken: string | null;
+  /** Operator of this example when it differs from the vehicle's nation (e.g. a captured tank). */
+  operator: string | null;
   date_taken: string | null;
   lat: number | null;
   lng: number | null;
@@ -49,6 +51,7 @@ export interface LightboxPhoto {
   width: number | null;
   height: number | null;
   location_taken: string | null;
+  operator: string | null;
   /**
    * Per-photo vehicle, for entries whose photos are NOT all the same vehicle.
    * A grid card omits it — every photo in that entry shares `entry.vehicle`.
@@ -92,6 +95,7 @@ export interface TimelinePhoto {
   vehicle_type: VehicleType;
   vehicle_era: VehicleEra;
   vehicle_nation: string | null;
+  operator: string | null;
 }
 
 // Photos clustered by location + month — one trip to one museum.

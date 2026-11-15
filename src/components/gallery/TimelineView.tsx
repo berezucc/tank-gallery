@@ -44,6 +44,7 @@ export function TimelineView({ visits }: Props) {
             width: p.width,
             height: p.height,
             location_taken: visit.location,
+            operator: p.operator,
             vehicle: {
               name: p.vehicle_name,
               type: p.vehicle_type,

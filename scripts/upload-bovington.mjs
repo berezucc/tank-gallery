@@ -193,7 +193,7 @@ const VEHICLES = [
   { name: "Ram Kangaroo", type: "vehicle", era: "ww2", nation: "Canada",
     location: "The Tank Museum, Bovington",
     files: ["ram kangarro.HEIC"] },
-  { name: "T-34-76 (Finnish)", type: "tank", era: "ww2", nation: "USSR/Finland",
+  { name: "T-34-76", type: "tank", era: "ww2", nation: "USSR",
     location: "The Tank Museum, Bovington",
     files: ["IMG_1939finish capture t3476.HEIC", "IMG_1940finish capture t3476.HEIC"] },
   { name: "T-34-85", type: "tank", era: "ww2", nation: "USSR",
